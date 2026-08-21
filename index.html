@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📚 雲教室備課資料 v1.7.2</title>
+    <title>📚 雲教室備課資料 v1.7.3 (AI 修正版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
@@ -70,7 +70,6 @@
             transition: opacity 0.3s ease, transform 0.3s ease;
         }
 
-        /* 遊戲化 UX：已加入常用時的 Hover 切換效果 */
         .btn-shortcut-saved {
             @apply bg-green-100 text-green-700 border-green-300;
         }
@@ -89,7 +88,7 @@
 
     <header class="fixed top-0 left-0 w-full bg-white shadow-md z-30" style="background-color: var(--header-bg);">
         <div class="container mx-auto max-w-5xl flex flex-col md:flex-row justify-between items-center p-4 gap-3">
-            <h1 class="text-2xl font-bold" style="color: var(--header-text);">📚 雲教室備課資料 v1.7.1</h1>
+            <h1 class="text-2xl font-bold" style="color: var(--header-text);">📚 雲教室備課資料 v1.7.3 (AI 修正版)</h1>
             
             <div class="flex items-center gap-3 w-full md:w-auto">
                 <select id="workspaceSwitcher" title="快速切換常用教學區" class="flex-grow md:flex-grow-0 p-2 border-2 border-blue-300 rounded-lg text-sm bg-blue-50 text-blue-800 font-bold focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer transition-all hover:bg-blue-100">
@@ -131,7 +130,7 @@
     <div id="adminModal" class="modal hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-40 flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="modal-content bg-gray-50 rounded-2xl shadow-2xl w-full max-w-7xl max-h-[90vh] overflow-hidden flex flex-col border border-gray-200">
             <header class="p-5 border-b bg-white rounded-t-2xl flex justify-between items-center shadow-sm z-10">
-                <h2 class="text-2xl font-bold text-gray-800">🔐 教材管理後台 (v1.7.1)</h2>
+                <h2 class="text-2xl font-bold text-gray-800">🔐 教材管理後台 (v1.7.3)</h2>
                 <button id="closeAdminBtn" class="text-4xl text-gray-400 hover:text-red-500 transition-colors">&times;</button>
             </header>
             
@@ -166,12 +165,10 @@
                             <div id="customSubjectList" class="flex flex-wrap gap-2 min-h-[32px] p-2 bg-white rounded-md border border-purple-100"></div>
                         </section>
 
-                        <!-- ▼ 新增：常用教學區管理 ▼ -->
                         <section class="bg-orange-50 p-5 rounded-xl border border-orange-200 shadow-sm mt-6 hover:shadow-md transition-shadow">
                             <h3 class="text-lg font-semibold text-orange-800 mb-3 flex items-center gap-2">⭐ 常用教學區管理</h3>
                             <div id="shortcutList" class="flex flex-wrap gap-2 min-h-[32px] p-2 bg-white rounded-md border border-orange-100 transition-all"></div>
                         </section>
-                        <!-- ▲ 新增結束 ▲ -->
                         
                         <section class="bg-indigo-50 p-5 rounded-xl border border-indigo-200 shadow-sm">
                             <h3 class="text-lg font-semibold text-indigo-800 mb-3 flex items-center gap-2">🧠 AI 資料解析 (批次匯入)</h3>
@@ -244,7 +241,7 @@
                         </section>
                     </div>
 
-                    <!-- 🗄️ v1.7.1 新增：資料維護與安全清理中心 -->
+                    <!-- 🗄️ 資料維護與安全清理中心 -->
                     <section class="mt-2 bg-gray-800 p-5 rounded-xl border border-gray-700 shadow-md col-span-1 lg:col-span-2">
                         <h3 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">🗄️ 資料維護與安全清理中心</h3>
                         <p class="text-sm text-gray-400 mb-4">執行備份、還原合併與防呆清理。高風險動作均帶有確認機制，請謹慎操作。</p>
@@ -372,7 +369,6 @@
         addCustomSubBtn: document.getElementById("addCustomSubjectBtn"), customSubList: document.getElementById("customSubjectList"),
         shortcutList: document.getElementById("shortcutList"),
         
-        // 🗄️ v1.7.1 新增 DOM
         btnExportBackup: document.getElementById("btnExportBackup"), btnImportBackup: document.getElementById("btnImportBackup"),
         importJsonInput: document.getElementById("importJsonInput"), btnClearLevelA: document.getElementById("btnClearLevelA"),
         btnClearLevelB: document.getElementById("btnClearLevelB"), btnClearLevelC: document.getElementById("btnClearLevelC")
@@ -414,14 +410,11 @@
         const pathStr = currentPathParts.join("_"); 
         const shortcuts = JSON.parse(localStorage.getItem(SHORTCUTS_STORAGE_KEY) || "{}");
         
-        // 重置按鈕內容，用 ::before 的 CSS 來控制文字切換
         dom.saveWorkspaceBtn.innerHTML = ""; 
         
         if (shortcuts[pathStr]) {
-            // 已是常用：套用 UX 遊戲化樣式 (Hover 切換)
             dom.saveWorkspaceBtn.className = "btn-shortcut-saved border font-bold py-1 px-3 rounded shadow-sm text-sm transition-all transform hover:scale-105 active:scale-95";
         } else {
-            // 尚未加入
             dom.saveWorkspaceBtn.innerHTML = "⭐ 設為常用";
             dom.saveWorkspaceBtn.className = "bg-yellow-100 hover:bg-yellow-200 text-yellow-800 border border-yellow-300 font-bold py-1 px-3 rounded shadow-sm text-sm transition-all transform hover:scale-105 active:scale-95";
         }
@@ -459,13 +452,13 @@
     }
 
     window.removeAdminShortcut = function(pathStr) {
-        playSound('error'); // 使用 error 音效製造刪除的打擊感
+        playSound('error'); 
         const el = document.getElementById(`shortcut-item-${pathStr}`);
         if(el) {
             el.classList.add('shortcut-item-exit');
             setTimeout(() => {
                 executeRemoveShortcut(pathStr);
-            }, 250); // 動畫結束後刪除資料與更新UI
+            }, 250); 
         } else {
             executeRemoveShortcut(pathStr);
         }
@@ -732,9 +725,7 @@
     }
     function openAdminModal() { playSound('click'); dom.adminModal.classList.add("visible"); dom.adminModal.classList.remove("hidden"); loadAiSettingsStatus(); loadShortcutsUI(); }
 
-    /* --- 🗄️ v1.7.1 資料維護與安全清理功能 --- */
-    
-    // 工具: 下載 JSON 備份
+    /* --- 🗄️ 資料維護與安全清理功能 --- */
     async function exportBackup(prefixName = "雲教室教材備份") {
         try {
             showToast("⏳ 正在打包資料，請稍候...", "info");
@@ -754,10 +745,8 @@
         } catch(e) { showToast("❌ 備份失敗", "error"); console.error(e); return false; }
     }
 
-    // 1. 📦 封存資料
     dom.btnExportBackup.addEventListener('click', () => { playSound('click'); exportBackup(); });
 
-    // 2. 📂 匯入復原
     dom.btnImportBackup.addEventListener('click', () => { playSound('click'); dom.importJsonInput.click(); });
     dom.importJsonInput.addEventListener('change', (e) => {
         const file = e.target.files[0]; if (!file) return;
@@ -784,12 +773,11 @@
                     currentDocCache = {}; renderNavigator(currentPathParts.length);
                 }
             } catch(err) { showToast("❌ 檔案解析失敗，非有效備份檔", "error"); }
-            e.target.value = ''; // Reset input
+            e.target.value = ''; 
         };
         reader.readAsText(file);
     });
 
-    // 3. 🧹 層級 A：清空面板
     dom.btnClearLevelA.addEventListener('click', () => {
         playSound('click');
         dom.aiResultPreviewDynamic.innerHTML = ''; dom.aiPreviewArea.classList.add('hidden');
@@ -802,7 +790,6 @@
         showToast("🧹 編輯面板與暫存已完全清空", "success");
     });
 
-    // 4. 🗑️ 層級 B：刪除學期
     dom.btnClearLevelB.addEventListener('click', async () => {
         playSound('error'); const f = getAdminFormObj();
         const prefix = [f.publisher.value, f.subject.value, f.semester.value, f.grade.value].join("_");
@@ -826,7 +813,6 @@
         } catch(e) { showToast("❌ 刪除失敗", "error"); console.error(e); }
     });
 
-    // 5. ☢️ 層級 C：全機重置
     dom.btnClearLevelC.addEventListener('click', async () => {
         playSound('error');
         alert("☢️ 準備執行原廠重置！\n系統將先強制下載完整備份，接著徹底清空所有雲端與本機設定資料。");
@@ -860,17 +846,68 @@
     });
 
 
-    /* --- AI Processing --- */
-    const AI_PROMPTS = {
-        ai_shengzi: "任務：分析生字。\n輸出：[{\"grade\":\"G5\",\"semester\":\"S1\",\"lesson\":\"L1\",\"content\":\"字...\"}]\n---請分析：",
-        ai_lesson_text: "任務：分析課文。\n輸出：[{\"grade\":\"G5\",\"semester\":\"S1\",\"lesson\":\"L1\",\"content\":\"內文...\"}]\n---請分析：",
-        ai_terms: "任務：擷取語詞。\n輸出：[{\"grade\":\"G5\",\"semester\":\"S1\",\"lesson\":\"L1\",\"content\":[\"詞1\"]}]\n---請分析：",
-        ai_patterns: "任務：分析句型。\n輸出：[{\"grade\":\"G5\",\"semester\":\"S1\",\"lesson\":\"L1\",\"content\":[\"句1\"]}]\n---請分析："
-    };
+    /* --- AI Processing (v1.6.0 Restored & Optimized) --- */
+    const gradeMap = { '一': 'G1', '二': 'G2', '三': 'G3', '四': 'G4', '五': 'G5', '六': 'G6' };
+    const semesterMap = { '上': 'S1', '下': 'S2' };
+    const lessonMap = { '一': 'L1', '二': 'L2', '三': 'L3', '四': 'L4', '五': 'L5', '六': 'L6', '七': 'L7', '八': 'L8', '九': 'L9', '十': 'L10', '十一': 'L11', '十二': 'L12', '起': 'L1Z' };
+
+    const AI_BASE_PROMPT = `您是一個專業的資料分析師。請分析以下提供的文字，並**嚴格依照**指定的 JSON 格式回傳結果。
+**重要規則：**
+1.  **年級/學期對應**：請使用此對應表：${JSON.stringify(gradeMap)} 和 ${JSON.stringify(semesterMap)}。
+2.  **課次對應**：請使用此對應表：${JSON.stringify(lessonMap)}。
+3.  **JSON 格式**：您的回覆**必須**是一個合法的 JSON 陣列，不包含任何 JSON 以外的說明文字。
+---
+`;
+
+    const AI_PROMPT_SHENGZI = AI_BASE_PROMPT + `
+**任務**：分析單行密集型的生字資料。
+**輸出格式**：請回傳一個 JSON 陣列，格式如下 (生字內容請移除所有空格)：
+\`[
+  {"grade": "G5", "semester": "S1", "lesson": "L1", "content": "堅耐勞元蝟擁繩刷膏遭係充供凸彼協融洽諦"}
+]\`
+---
+請開始分析以下資料：
+`;
+
+    const AI_PROMPT_LESSON_TEXT = AI_BASE_PROMPT + `
+**任務**：分析多段落的長文件，將每一課的完整課文擷取出來。
+**輸出格式**：請回傳一個 JSON 陣列，格式如下 (content 必須包含從 "第X課" 開始的完整原文)：
+\`[
+  {"grade": "G5", "semester": "S1", "lesson": "L1", "content": "第一課 你我之間 蔡仁偉... (完整內文與賞析)"}
+]\`
+---
+請開始分析以下資料：
+`;
+
+    const AI_PROMPT_TERMS = AI_BASE_PROMPT + `
+**任務**：分析備課資料，僅擷取 "■ 語詞解釋" 區塊中的所有語詞。
+**輸出格式**：請回傳一個 JSON 陣列 (假設文件只針對一課)，content 應為一個包含所有語詞的字串陣列：
+\`[
+  {"grade": "G5", "semester": "S1", "lesson": "L1", "content": ["堅定", "耐勞", "多元", "刺蝟", "擁抱"]}
+]\`
+---
+請開始分析以下資料：
+`;
+
+    const AI_PROMPT_PATTERNS = AI_BASE_PROMPT + `
+**任務**：分析備課資料，擷取 "短語練習"、"句型練習" 和 "造句練習" 的核心內容。
+**分析規則 (仿 v2.4.1 邏輯)：**
+1.  **短語練習**：找出課文例句 (例如：1. 立下「完璧歸趙」的奇功)，並參考其下的範本句 (例如：(1) 立下全國冠軍的成績)，找出可替換的詞，並只輸出課文例句，將可替換部分用全形括號「（）」包起來。 (例如：立下（「完璧歸趙」）的（奇功）)
+2.  **句型練習**：抽取出核心句構，用 ... 代表可變動的部分。 (例如：每到...時，...就...，以免...)
+3.  **造句練習**：只抽取出目標語詞本身 (例如：1. 羞辱)。 (例如：羞辱)
+**輸出格式**：請回傳一個 JSON 陣列 (假設文件只針對一課)，content 應為一個包含所有分析結果的**字串陣列**：
+\`[
+  {"grade": "G5", "semester": "S1", "lesson": "L3", "content": ["立下（「完璧歸趙」）的（奇功）", "這（件事）讓（廉頗）（十分）（不滿）", "每到...時，...就...，以免...", "連...都會怎麼樣，更何況...", "如果...，不是正好讓...？", "羞辱", "懦弱", "協助"]}
+]\`
+---
+請開始分析以下資料：
+`;
+
     function logBatch(msg, type='info') {
         const p = document.createElement('p'); p.textContent = msg; p.className = type;
         dom.batchLog.appendChild(p); dom.batchLog.scrollTop = dom.batchLog.scrollHeight;
     }
+    
     async function handleBatchUpload() {
         playSound('click'); const rawText = dom.textInputArea.value; if(!rawText.trim()) return showToast("⚠️ 沒有文字", "error");
         const apiKey = localStorage.getItem(API_KEY_STORAGE_KEY); if(!apiKey) return showToast("⚠️ 請先設定 API 金鑰", "error");
@@ -878,7 +915,23 @@
         dom.batchLog.innerHTML = ""; dom.batchLog.classList.remove('hidden'); dom.aiPreviewArea.classList.add('hidden');
         dom.batchUploadBtn.disabled = true; dom.batchUploadBtn.textContent = "⏳ AI 高速運算中...";
         
-        let fullPrompt = `您是專業分析師。依照格式回傳合法 JSON 陣列。年級(G1-G6),學期(S1/S2),課次(L1-L12/L1Z)。\n${AI_PROMPTS[dom.analysisMode.value]}\n**額外指令**：\n${dom.aiExtraPrompt.value.trim()}\n---\n${rawText}`;
+        // 判斷套用哪一個還原的強定義 Prompt
+        let promptToUse = "";
+        const mode = dom.analysisMode.value;
+        if (mode === "ai_shengzi") promptToUse = AI_PROMPT_SHENGZI;
+        else if (mode === "ai_lesson_text") promptToUse = AI_PROMPT_LESSON_TEXT;
+        else if (mode === "ai_terms") promptToUse = AI_PROMPT_TERMS;
+        else if (mode === "ai_patterns") promptToUse = AI_PROMPT_PATTERNS;
+        else promptToUse = AI_BASE_PROMPT;
+
+        // 結合 v1.7.2 的自訂額外指令
+        let fullPrompt = promptToUse;
+        const extraP = dom.aiExtraPrompt.value.trim();
+        if (extraP) {
+            fullPrompt += `\n**額外指令 (優先度高)：**\n${extraP}\n--- (額外指令結束) ---\n`;
+        }
+        fullPrompt += "\n" + rawText;
+
         try {
             logBatch("⏳ 呼叫 AI 中...", "info");
             const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${localStorage.getItem(API_MODEL_STORAGE_KEY) || "gemini-1.5-flash-latest"}:generateContent?key=${apiKey}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({contents:[{parts:[{text:fullPrompt}]}]}) });
@@ -907,7 +960,7 @@
         dom.confirmBatchUploadBtn.disabled = true; dom.confirmBatchUploadBtn.textContent = "⏳ 寫入雲端中...";
         try {
             for(let item of parsedData) {
-                const docId = `Hanlin_Chinese_${item.s}_${item.g}_${item.l}`; // Defaulting as original behavior
+                const docId = `Hanlin_Chinese_${item.s}_${item.g}_${item.l}`; 
                 const ref = db.collection(CURRICULUM_COLLECTION).doc(docId); const snap = await ref.get();
                 let cont = snap.exists ? snap.data().content : { mainText: "", fields: [] }; if(!cont.fields) cont.fields = [];
                 const update = (lbl, data) => { const i = cont.fields.findIndex(f=>f.label===lbl); if(i>-1) cont.fields[i].data = data; else cont.fields.push({label:lbl, data}); };
