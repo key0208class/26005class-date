@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📚 雲教室備課資料 v1.7.3 (AI 修正版)</title>
+    <title>📚 雲教室備課資料 v1.9.0 (全動態 AI 升級版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
@@ -13,18 +13,8 @@
     </script>
     
     <style>
-        :root {
-            --primary-bg: #f9fafb; 
-            --header-bg: #ffffff; 
-            --header-text: #1d4ed8; 
-            --btn-hover-scale: 1.02; 
-        }
-
-        body { 
-            font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif; 
-            background-color: var(--primary-bg);
-        }
-
+        :root { --primary-bg: #f9fafb; --header-bg: #ffffff; --header-text: #1d4ed8; --btn-hover-scale: 1.02; }
+        body { font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif; background-color: var(--primary-bg); }
         .modal { transition: opacity 0.3s ease, visibility 0.3s ease; }
         .modal-content { transition: transform 0.3s ease; }
         .modal.hidden { visibility: hidden; opacity: 0; }
@@ -37,12 +27,8 @@
             @apply hover:bg-blue-50 hover:shadow-md hover:border-blue-300;
             transform: scale(1);
         }
-        .nav-button:hover {
-            transform: scale(var(--btn-hover-scale));
-        }
-        .nav-button-disabled {
-            @apply w-full text-left px-5 py-4 bg-gray-100 shadow-inner rounded-lg border border-gray-200 text-gray-400 cursor-not-allowed opacity-60;
-        }
+        .nav-button:hover { transform: scale(var(--btn-hover-scale)); }
+        .nav-button-disabled { @apply w-full text-left px-5 py-4 bg-gray-100 shadow-inner rounded-lg border border-gray-200 text-gray-400 cursor-not-allowed opacity-60; }
         
         #batchLog p { @apply py-1 px-2 border-b border-gray-100; }
         #batchLog p.error { @apply bg-red-100 text-red-700; }
@@ -55,32 +41,27 @@
         }
         #file-upload-input:hover::file-selector-button { @apply bg-indigo-700; }
         
-        .ai-preview-box { @apply bg-white p-4 rounded-lg border border-gray-300 shadow-sm grid grid-cols-1 md:grid-cols-4 gap-3; }
+        .ai-preview-box { @apply bg-white p-4 rounded-lg border border-gray-300 shadow-sm grid grid-cols-2 md:grid-cols-5 gap-3; }
         .ai-preview-box label { @apply block text-xs font-medium text-gray-500 mb-1; }
-        .ai-preview-box input, .ai-preview-box textarea { @apply w-full p-2 border rounded-md text-sm font-mono bg-gray-50; }
-        .ai-preview-box .content-area { @apply md:col-span-4; }
+        .ai-preview-box input, .ai-preview-box textarea { @apply w-full p-2 border rounded-md text-sm font-mono bg-gray-50 focus:ring-1 focus:ring-indigo-400; }
+        .ai-preview-box .content-area { @apply col-span-2 md:col-span-5; }
         
-        .custom-subject-tag {
-            @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 border border-purple-200;
-        }
-        
-        .shortcut-item-exit {
-            opacity: 0;
-            transform: scale(0.9);
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
+        .custom-subject-tag { @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 border border-purple-200; }
+        .shortcut-item-exit { opacity: 0; transform: scale(0.9); transition: opacity 0.3s ease, transform 0.3s ease; }
+        .btn-shortcut-saved { @apply bg-green-100 text-green-700 border-green-300; }
+        .btn-shortcut-saved:hover { @apply bg-red-100 text-red-700 border-red-300; }
+        .btn-shortcut-saved::before { content: "🌟 已存為常用"; }
+        .btn-shortcut-saved:hover::before { content: "❌ 取消常用"; }
 
-        .btn-shortcut-saved {
-            @apply bg-green-100 text-green-700 border-green-300;
+        /* 分頁標籤樣式 */
+        .admin-tab-btn {
+            @apply px-6 py-3 font-bold text-sm rounded-t-lg border-b-4 transition-all duration-200 cursor-pointer flex-1 text-center;
         }
-        .btn-shortcut-saved:hover {
-            @apply bg-red-100 text-red-700 border-red-300;
+        .admin-tab-btn.active {
+            @apply text-blue-700 border-blue-600 bg-blue-50/50 shadow-inner;
         }
-        .btn-shortcut-saved::before {
-            content: "🌟 已存為常用";
-        }
-        .btn-shortcut-saved:hover::before {
-            content: "❌ 取消常用";
+        .admin-tab-btn:not(.active) {
+            @apply text-gray-500 border-transparent hover:bg-gray-100 hover:text-blue-500 hover:border-blue-300;
         }
     </style>
 </head>
@@ -88,7 +69,7 @@
 
     <header class="fixed top-0 left-0 w-full bg-white shadow-md z-30" style="background-color: var(--header-bg);">
         <div class="container mx-auto max-w-5xl flex flex-col md:flex-row justify-between items-center p-4 gap-3">
-            <h1 class="text-2xl font-bold" style="color: var(--header-text);">📚 雲教室備課資料 v1.7.3 (AI 修正版)</h1>
+            <h1 class="text-2xl font-bold" style="color: var(--header-text);">📚 雲教室備課資料 v1.9.0 (全動態 AI 版)</h1>
             
             <div class="flex items-center gap-3 w-full md:w-auto">
                 <select id="workspaceSwitcher" title="快速切換常用教學區" class="flex-grow md:flex-grow-0 p-2 border-2 border-blue-300 rounded-lg text-sm bg-blue-50 text-blue-800 font-bold focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm cursor-pointer transition-all hover:bg-blue-100">
@@ -129,32 +110,26 @@
     <!-- ⚙️ 管理後台模態框 -->
     <div id="adminModal" class="modal hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-40 flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="modal-content bg-gray-50 rounded-2xl shadow-2xl w-full max-w-7xl max-h-[90vh] overflow-hidden flex flex-col border border-gray-200">
-            <header class="p-5 border-b bg-white rounded-t-2xl flex justify-between items-center shadow-sm z-10">
-                <h2 class="text-2xl font-bold text-gray-800">🔐 教材管理後台 (v1.7.3)</h2>
-                <button id="closeAdminBtn" class="text-4xl text-gray-400 hover:text-red-500 transition-colors">&times;</button>
+            
+            <header class="bg-white rounded-t-2xl shadow-sm z-10 flex flex-col">
+                <div class="p-5 flex justify-between items-center border-b">
+                    <h2 class="text-2xl font-bold text-gray-800">🔐 教材管理後台 (v1.9.0)</h2>
+                    <button id="closeAdminBtn" class="text-4xl text-gray-400 hover:text-red-500 transition-colors">&times;</button>
+                </div>
+                <!-- 🚀 分頁導覽列 -->
+                <div class="flex px-2 pt-2 bg-gray-50">
+                    <button class="admin-tab-btn active" data-tab="tab-content">📝 教材編輯</button>
+                    <button class="admin-tab-btn" data-tab="tab-maintain">🗄️ 資料維護</button>
+                    <button class="admin-tab-btn" data-tab="tab-ai">🧠 AI 智能中心</button>
+                </div>
             </header>
             
             <div id="adminForm" class="p-6 flex-grow overflow-y-auto">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    
+                
+                <!-- ================= TAB 1: 📝 教材編輯 ================= -->
+                <div id="tab-content" class="tab-pane grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- 左半部 -->
                     <div class="space-y-6">
-                        <section class="bg-yellow-50 p-5 rounded-xl border border-yellow-200 shadow-sm">
-                            <h3 class="text-lg font-semibold text-yellow-800 mb-3 flex items-center gap-2">🤖 AI 助理設定</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                <div class="md:col-span-2">
-                                    <input type="password" id="googleAiApiKey" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400" placeholder="在此貼上 API 金鑰...">
-                                </div>
-                                <div>
-                                    <input type="text" id="googleAiModelName" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400" value="gemini-1.5-flash-latest">
-                                </div>
-                            </div>
-                            <div class="mt-3 flex items-center gap-3">
-                                <button id="saveAiSettingsBtn" type="button" class="px-5 py-2.5 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-lg shadow transition-colors">儲存設定</button>
-                                <span id="aiSettingsStatus" class="text-xs text-gray-500 font-mono"></span>
-                            </div>
-                        </section>
-
                         <section class="bg-purple-50 p-5 rounded-xl border border-purple-200 shadow-sm">
                             <h3 class="text-lg font-semibold text-purple-800 mb-3 flex items-center gap-2">➕ 自訂科目管理</h3>
                             <div class="flex flex-col sm:flex-row gap-2 mb-4">
@@ -165,25 +140,33 @@
                             <div id="customSubjectList" class="flex flex-wrap gap-2 min-h-[32px] p-2 bg-white rounded-md border border-purple-100"></div>
                         </section>
 
-                        <section class="bg-orange-50 p-5 rounded-xl border border-orange-200 shadow-sm mt-6 hover:shadow-md transition-shadow">
+                        <section class="bg-orange-50 p-5 rounded-xl border border-orange-200 shadow-sm">
                             <h3 class="text-lg font-semibold text-orange-800 mb-3 flex items-center gap-2">⭐ 常用教學區管理</h3>
                             <div id="shortcutList" class="flex flex-wrap gap-2 min-h-[32px] p-2 bg-white rounded-md border border-orange-100 transition-all"></div>
                         </section>
                         
-                        <section class="bg-indigo-50 p-5 rounded-xl border border-indigo-200 shadow-sm">
-                            <h3 class="text-lg font-semibold text-indigo-800 mb-3 flex items-center gap-2">🧠 AI 資料解析 (批次匯入)</h3>
+                        <section class="bg-indigo-50 p-5 rounded-xl border border-indigo-200 shadow-sm relative">
+                            <h3 class="text-lg font-semibold text-indigo-800 mb-3 flex items-center gap-2">🧠 AI 資料解析 (動態模式)</h3>
+                            
+                            <!-- AI 新增下拉選項覆蓋機制 -->
+                            <div class="grid grid-cols-2 gap-2 mb-3 bg-white p-3 rounded-lg border border-indigo-100 shadow-sm">
+                                <div><label class="block text-xs font-bold text-indigo-700 mb-1">強制指定版本</label><select id="aiOverridePublisher" class="w-full p-2 border rounded-md text-sm bg-gray-50 focus:bg-white"><option value="">🤖 AI 自動判斷</option><option value="Hanlin">翰林</option><option value="Nanyi">南一</option><option value="Kangxuan">康軒</option></select></div>
+                                <div><label class="block text-xs font-bold text-indigo-700 mb-1">強制指定科目</label><select id="aiOverrideSubject" class="w-full p-2 border rounded-md text-sm bg-gray-50 focus:bg-white"><option value="">🤖 AI 自動判斷</option></select></div>
+                                <div><label class="block text-xs font-bold text-indigo-700 mb-1">強制指定學期</label><select id="aiOverrideSemester" class="w-full p-2 border rounded-md text-sm bg-gray-50 focus:bg-white"><option value="">🤖 AI 自動判斷</option><option value="S1">上學期</option><option value="S2">下學期</option></select></div>
+                                <div><label class="block text-xs font-bold text-indigo-700 mb-1">強制指定年級</label><select id="aiOverrideGrade" class="w-full p-2 border rounded-md text-sm bg-gray-50 focus:bg-white"><option value="">🤖 AI 自動判斷</option><option value="G1">一年級</option><option value="G2">二年級</option><option value="G3">三年級</option><option value="G4">四年級</option><option value="G5">五年級</option><option value="G6">六年級</option><option value="G7">七年級</option><option value="G8">八年級</option><option value="G9">九年級</option></select></div>
+                            </div>
+
                             <input id="file-upload-input" type="file" accept=".txt,.pdf" class="mb-3">
-                            <select id="analysisMode" class="w-full p-2.5 border border-gray-300 rounded-lg mb-3 bg-white focus:ring-2 focus:ring-indigo-400 text-sm">
-                                <option value="ai_shengzi">📝 解析模式：生字 (單行密集型)</option>
-                                <option value="ai_lesson_text">📖 解析模式：完整課文 (多段落長文件)</option>
-                                <option value="ai_terms">🗣️ 解析模式：語詞 (擷取區塊語詞)</option>
-                                <option value="ai_patterns">🧩 解析模式：句型/短語/造句 (結構化分析)</option>
-                            </select>
-                            <textarea id="text-input-area" rows="6" class="w-full p-3 border border-gray-300 rounded-lg font-mono text-sm bg-white focus:ring-2 focus:ring-indigo-400 mb-3" placeholder="讀取之原始文字將顯示於此..."></textarea>
+                            <select id="analysisMode" class="w-full p-2.5 border border-gray-300 rounded-lg mb-3 bg-white focus:ring-2 focus:ring-indigo-400 text-sm font-bold text-indigo-900 shadow-sm"></select>
+                            <textarea id="text-input-area" rows="6" class="w-full p-3 border border-gray-300 rounded-lg font-mono text-sm bg-white focus:ring-2 focus:ring-indigo-400 mb-3 shadow-inner" placeholder="讀取之原始文字將顯示於此..."></textarea>
                             <input type="text" id="ai-extra-prompt" class="w-full p-2.5 border border-gray-300 rounded-lg bg-white mb-4 text-sm" placeholder="✏️ (選填) 額外 AI 指令，例：請只擷取標題為「一、」的內容">
 
                             <button id="batchUploadBtn" type="button" class="w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-md transition-all transform hover:scale-[1.02] disabled:bg-gray-400 disabled:scale-100">
                                 🔬 啟動 AI 分析
+                            </button>
+
+                            <button id="btnClearAI" type="button" class="w-full mt-3 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold rounded-lg transition-colors text-sm border border-gray-300">
+                                🧹 清空 AI 暫存區
                             </button>
                             
                             <div id="ai-preview-area" class="mt-5 hidden space-y-3 bg-white p-4 rounded-lg border border-indigo-200">
@@ -205,7 +188,7 @@
                                 <div><label class="block text-xs font-bold text-gray-600 mb-1">版本</label><select id="adminPublisher" class="w-full p-2 border rounded-md text-sm"><option value="Hanlin">翰林</option><option value="Nanyi">南一</option><option value="Kangxuan">康軒</option></select></div>
                                 <div><label class="block text-xs font-bold text-gray-600 mb-1">科目</label><select id="adminSubject" class="w-full p-2 border rounded-md text-sm"></select></div>
                                 <div><label class="block text-xs font-bold text-gray-600 mb-1">學期</label><select id="adminSemester" class="w-full p-2 border rounded-md text-sm"><option value="S1">上學期</option><option value="S2">下學期</option></select></div>
-                                <div><label class="block text-xs font-bold text-gray-600 mb-1">年級</label><select id="adminGrade" class="w-full p-2 border rounded-md text-sm"><option value="G1">一年級</option><option value="G2">二年級</option><option value="G3">三年級</option><option value="G4">四年級</option><option value="G5">五年級</option><option value="G6">六年級</option></select></div>
+                                <div><label class="block text-xs font-bold text-gray-600 mb-1">年級</label><select id="adminGrade" class="w-full p-2 border rounded-md text-sm"><option value="G1">一年級</option><option value="G2">二年級</option><option value="G3">三年級</option><option value="G4">四年級</option><option value="G5">五年級</option><option value="G6">六年級</option><option value="G7">七年級</option><option value="G8">八年級</option><option value="G9">九年級</option></select></div>
                             </div>
                             
                             <div class="flex flex-wrap gap-2 mb-4">
@@ -224,45 +207,117 @@
 
                             <div class="flex gap-3 mt-5">
                                 <button id="loadDataBtn" type="button" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow transition-colors">📥 載入內容</button>
-                                <button id="deleteDocBtn" type="button" class="flex-1 py-2.5 bg-red-100 hover:bg-red-600 hover:text-white text-red-700 font-bold rounded-lg border border-red-200 transition-colors">🗑️ 刪除此單元</button>
                             </div>
                         </section>
                         
-                        <section class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">📝 2. 手動編輯欄位</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-400 transition-all"><div class="flex justify-between items-center mb-1"><input type="text" id="adminLabel1" class="w-2/3 p-1 border-b border-gray-300 bg-transparent text-sm font-bold focus:outline-none focus:border-blue-500" placeholder="欄位名稱 (例: 生字)"><button type="button" class="text-xs text-red-400 hover:text-red-600 font-semibold" data-clear-id="1">清空</button></div><textarea id="adminContent1" rows="4" class="w-full p-2 border border-gray-300 rounded text-sm bg-white focus:outline-none" placeholder="每行一筆..."></textarea></div>
-                                <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-400 transition-all"><div class="flex justify-between items-center mb-1"><input type="text" id="adminLabel2" class="w-2/3 p-1 border-b border-gray-300 bg-transparent text-sm font-bold focus:outline-none focus:border-blue-500" placeholder="欄位名稱 (例: 語詞)"><button type="button" class="text-xs text-red-400 hover:text-red-600 font-semibold" data-clear-id="2">清空</button></div><textarea id="adminContent2" rows="4" class="w-full p-2 border border-gray-300 rounded text-sm bg-white focus:outline-none"></textarea></div>
-                                <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-400 transition-all"><div class="flex justify-between items-center mb-1"><input type="text" id="adminLabel3" class="w-2/3 p-1 border-b border-gray-300 bg-transparent text-sm font-bold focus:outline-none focus:border-blue-500" placeholder="欄位名稱 (例: 句型)"><button type="button" class="text-xs text-red-400 hover:text-red-600 font-semibold" data-clear-id="3">清空</button></div><textarea id="adminContent3" rows="4" class="w-full p-2 border border-gray-300 rounded text-sm bg-white focus:outline-none"></textarea></div>
-                                <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-400 transition-all"><div class="flex justify-between items-center mb-1"><input type="text" id="adminLabel4" class="w-2/3 p-1 border-b border-gray-300 bg-transparent text-sm font-bold focus:outline-none focus:border-blue-500" placeholder="欄位名稱 (例: 重點)"><button type="button" class="text-xs text-red-400 hover:text-red-600 font-semibold" data-clear-id="4">清空</button></div><textarea id="adminContent4" rows="4" class="w-full p-2 border border-gray-300 rounded text-sm bg-white focus:outline-none"></textarea></div>
+                        <section class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm relative">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2">📝 2. 動態欄位編輯區</h3>
+                                <div class="flex gap-2">
+                                    <button id="btnClearEdit" type="button" class="px-3 py-1 bg-red-100 text-red-700 border border-red-300 hover:bg-red-200 rounded text-sm font-bold transition-colors">🧹 清空內容</button>
+                                    <button id="addDynamicFieldBtn" type="button" class="px-3 py-1 bg-green-100 text-green-700 border border-green-300 hover:bg-green-200 rounded text-sm font-bold transition-colors">➕ 新增欄位</button>
+                                </div>
                             </div>
-                            <div class="mt-4 bg-gray-50 p-3 rounded-lg border border-gray-200 focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-400 transition-all"><div class="flex justify-between items-center mb-1"><input type="text" id="adminLabel5" class="w-1/2 p-1 border-b border-gray-300 bg-transparent text-sm font-bold focus:outline-none focus:border-blue-500" placeholder="欄位 5 名稱 (備用)"><button type="button" class="text-xs text-red-400 hover:text-red-600 font-semibold" data-clear-id="5">清空</button></div><textarea id="adminContent5" rows="2" class="w-full p-2 border border-gray-300 rounded text-sm bg-white focus:outline-none"></textarea></div>
-                            <div class="mt-4"><label class="block text-sm font-bold text-gray-700 mb-1">主要大段落內容 (如：完整課文)</label><textarea id="adminMainText" rows="6" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm bg-white shadow-inner" placeholder="在此貼上不需切割斷行的長篇文章..."></textarea></div>
+                            
+                            <!-- 存放無限擴展欄位的容器 -->
+                            <div id="dynamicFieldsContainer" class="flex flex-col gap-4"></div>
                         </section>
                     </div>
+                </div>
 
-                    <!-- 🗄️ 資料維護與安全清理中心 -->
-                    <section class="mt-2 bg-gray-800 p-5 rounded-xl border border-gray-700 shadow-md col-span-1 lg:col-span-2">
-                        <h3 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">🗄️ 資料維護與安全清理中心</h3>
-                        <p class="text-sm text-gray-400 mb-4">執行備份、還原合併與防呆清理。高風險動作均帶有確認機制，請謹慎操作。</p>
+                <!-- ================= TAB 2: 🗄️ 資料維護 ================= -->
+                <div id="tab-maintain" class="tab-pane hidden flex-col gap-6 max-w-4xl mx-auto">
+                    <section class="bg-white p-8 rounded-xl border border-gray-200 shadow-sm text-center">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">🗄️ 資料維護與安全清理中心</h2>
+                        <p class="text-gray-500 mb-8">執行備份、還原合併與防呆清理。高風險動作均帶有確認機制，請謹慎操作。</p>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
-                            <button id="btnExportBackup" class="px-4 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg text-sm shadow transition-colors flex items-center justify-center gap-1">📦 封存目前資料</button>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                            
+                            <div class="p-6 bg-blue-50 border border-blue-200 rounded-xl hover:shadow-md transition-shadow">
+                                <h3 class="text-lg font-bold text-blue-800 mb-2">📦 封存目前資料 (備份)</h3>
+                                <p class="text-sm text-blue-600 mb-4">將雲端資料庫目前的所有教材，完整打包下載為 JSON 備份檔，以防萬一。</p>
+                                <button id="btnExportBackup" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow transition-colors">立即備份下載</button>
+                            </div>
 
-                            <button id="btnImportBackup" class="px-4 py-3 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg text-sm shadow transition-colors flex items-center justify-center gap-1">📂 匯入備份還原</button>
-                            <input type="file" id="importJsonInput" accept=".json" class="hidden">
+                            <div class="p-6 bg-green-50 border border-green-200 rounded-xl hover:shadow-md transition-shadow">
+                                <h3 class="text-lg font-bold text-green-800 mb-2">📂 匯入備份還原</h3>
+                                <p class="text-sm text-green-600 mb-4">讀取先前的 JSON 備份檔。相同 ID 的單元將會被覆寫，新單元將會被加入。</p>
+                                <button id="btnImportBackup" class="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg shadow transition-colors">選擇檔案並還原</button>
+                                <input type="file" id="importJsonInput" accept=".json" class="hidden">
+                            </div>
 
-                            <button id="btnClearLevelA" class="px-4 py-3 bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold rounded-lg text-sm shadow transition-colors flex items-center justify-center gap-1">🧹 層級A: 清空面板</button>
+                            <div class="p-6 bg-orange-50 border border-orange-200 rounded-xl md:col-span-2 hover:shadow-md transition-shadow">
+                                <h3 class="text-lg font-bold text-orange-800 mb-2">🗑️ 刪除特定範圍 / 單一單元 (獨立防呆機制)</h3>
+                                <p class="text-sm text-orange-600 mb-4">請先指定目標範圍，再選擇要刪除特定一課，或批次刪除整個學期。</p>
+                                
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4 p-4 bg-white rounded-lg border border-orange-100 shadow-sm">
+                                    <div><label class="block text-xs font-bold text-gray-600 mb-1">選擇版本</label><select id="delPublisher" class="w-full p-2 border rounded-md text-sm"><option value="Hanlin">翰林</option><option value="Nanyi">南一</option><option value="Kangxuan">康軒</option></select></div>
+                                    <div><label class="block text-xs font-bold text-gray-600 mb-1">選擇科目</label><select id="delSubject" class="w-full p-2 border rounded-md text-sm"></select></div>
+                                    <div><label class="block text-xs font-bold text-gray-600 mb-1">選擇學期</label><select id="delSemester" class="w-full p-2 border rounded-md text-sm"><option value="S1">上學期</option><option value="S2">下學期</option></select></div>
+                                    <div><label class="block text-xs font-bold text-gray-600 mb-1">選擇年級</label><select id="delGrade" class="w-full p-2 border rounded-md text-sm"><option value="G1">一年級</option><option value="G2">二年級</option><option value="G3">三年級</option><option value="G4">四年級</option><option value="G5">五年級</option><option value="G6">六年級</option><option value="G7">七年級</option><option value="G8">八年級</option><option value="G9">九年級</option></select></div>
+                                </div>
 
-                            <button id="btnClearLevelB" class="px-4 py-3 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-lg text-sm shadow transition-colors flex items-center justify-center gap-1">🗑️ 層級B: 刪除學期</button>
+                                <div class="flex gap-2 mb-4">
+                                    <button id="btnFetchDelUnits" type="button" class="w-full py-2 bg-orange-100 hover:bg-orange-200 text-orange-800 font-bold rounded-lg border border-orange-300 transition-colors text-sm shadow-sm">🔄 偵測該範圍可刪除單元</button>
+                                </div>
+                                <select id="delUnitSelector" class="w-full p-2.5 border border-orange-300 rounded-md bg-white focus:ring-2 focus:ring-orange-400 mb-4 hidden font-bold"></select>
 
-                            <button id="btnClearLevelC" class="px-4 py-3 bg-red-700 hover:bg-red-600 text-white font-bold rounded-lg text-sm shadow transition-colors border border-red-500 flex items-center justify-center gap-1">☢️ 層級C: 全機重置</button>
+                                <div class="flex flex-col sm:flex-row gap-3 mt-4">
+                                    <button id="btnDeleteSingle" type="button" class="flex-1 py-3 bg-orange-200 hover:bg-orange-500 hover:text-white text-orange-800 font-bold rounded-lg transition-colors border border-orange-300 hidden">🗑️ 刪除所選之單一單元</button>
+                                    <button id="btnDeleteSemester" class="flex-1 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg shadow transition-colors">⚠️ 刪除整個指定學期</button>
+                                </div>
+                            </div>
+
+                            <div class="p-6 bg-red-50 border border-red-200 rounded-xl md:col-span-2 hover:shadow-md transition-shadow">
+                                <h3 class="text-lg font-bold text-red-800 mb-2">☢️ 全機重置 (終極清理)</h3>
+                                <p class="text-sm text-red-600 mb-4">最危險的操作。將強制觸發備份下載後，徹底清空所有雲端資料與本機設定。適用於學年度轉換。</p>
+                                <button id="btnClearLevelC" class="w-full py-4 bg-red-700 hover:bg-red-800 text-white font-bold text-lg rounded-lg shadow transition-colors border border-red-900">⚠️ 確認執行原廠重置</button>
+                            </div>
+
                         </div>
                     </section>
-                </div> 
+                </div>
+
+                <!-- ================= TAB 3: 🧠 AI 智能中心 ================= -->
+                <div id="tab-ai" class="tab-pane hidden flex-col gap-6 max-w-5xl mx-auto w-full">
+                    
+                    <section class="bg-yellow-50 p-6 rounded-xl border border-yellow-200 shadow-sm">
+                        <h3 class="text-xl font-bold text-yellow-800 mb-2 flex items-center gap-2">🔑 1. AI 引擎核心設定</h3>
+                        <p class="text-sm text-yellow-700 mb-4">設定 Google Gemini API 權限，啟動 AI 智能解析功能。</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-yellow-700 mb-1">API 金鑰 (API Key)</label>
+                                <input type="password" id="googleAiApiKey" class="w-full p-2.5 border border-yellow-300 rounded-lg focus:ring-2 focus:ring-yellow-500" placeholder="在此貼上 API 金鑰 (儲存於本機安全空間)...">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-yellow-700 mb-1">AI 運算模型</label>
+                                <input type="text" id="googleAiModelName" class="w-full p-2.5 border border-yellow-300 rounded-lg focus:ring-2 focus:ring-yellow-500 font-mono" value="gemini-1.5-flash-latest">
+                            </div>
+                        </div>
+                        <div class="mt-4 flex items-center gap-4">
+                            <button id="saveAiSettingsBtn" type="button" class="px-6 py-2.5 bg-yellow-600 hover:bg-yellow-700 text-white font-bold rounded-lg shadow transition-colors">💾 儲存 AI 設定</button>
+                            <span id="aiSettingsStatus" class="text-sm font-mono bg-white px-3 py-1 rounded border"></span>
+                        </div>
+                    </section>
+
+                    <section class="bg-indigo-50 p-6 rounded-xl border border-indigo-200 shadow-sm">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xl font-bold text-indigo-800 flex items-center gap-2">🎯 2. 解析模式與提示詞管理</h3>
+                            <div class="flex gap-2">
+                                <button id="restoreDefaultPromptsBtn" class="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded text-sm font-bold transition-colors">🔄 恢復原廠設定</button>
+                                <button id="addNewPromptBtn" class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-sm font-bold shadow transition-colors">➕ 建立新規則</button>
+                            </div>
+                        </div>
+                        <p class="text-sm text-indigo-600 mb-6">底層已強制鎖死輸出 JSON 格式及單元代號轉換，您只需專注於「任務目標與範例」即可，AI 將會把結果自動寫入您指定的「目標標題」中。</p>
+                        
+                        <div id="aiPromptsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                    </section>
+
+                </div>
+
             </div>
             
-            <footer class="p-5 border-t bg-gray-50 rounded-b-2xl flex justify-end gap-3 z-10 shadow-[0_-5px_15px_-5px_rgba(0,0,0,0.1)]">
+            <footer class="p-5 border-t bg-gray-50 rounded-b-2xl flex justify-end gap-3 z-10 shadow-[0_-5px_15px_-5px_rgba(0,0,0,0.1)] relative">
                 <button id="saveDataBtn" type="button" class="w-full md:w-64 px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-xl shadow-lg transition-all transform hover:-translate-y-1 hover:shadow-xl">
                     💾 儲存寫入單元
                 </button>
@@ -275,7 +330,7 @@
     </div>
 
 <script>
-    /* Firebase Initialization (Do not change) */
+    /* Firebase Initialization */
     const firebaseConfig = {
       apiKey: "AIzaSyB2TJo3c88XGE-f4JcmB5w5mCmN4FnJsQI",
       authDomain: "myclass26005-date.firebaseapp.com",
@@ -294,11 +349,8 @@
         try {
             if (!audioCtx) audioCtx = new AudioContext();
             if (audioCtx.state === 'suspended') audioCtx.resume();
-            const oscillator = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            oscillator.connect(gainNode); gainNode.connect(audioCtx.destination);
-            const now = audioCtx.currentTime;
-            
+            const oscillator = audioCtx.createOscillator(); const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode); gainNode.connect(audioCtx.destination); const now = audioCtx.currentTime;
             if (type === 'click') {
                 oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(800, now);
                 oscillator.frequency.exponentialRampToValueAtTime(300, now + 0.05);
@@ -328,6 +380,7 @@
     const LAST_WORKSPACE_KEY = "lastWorkspace_v1.7.0"; 
     const API_KEY_STORAGE_KEY = "googleAiApiKey";
     const API_MODEL_STORAGE_KEY = "googleAiModelName";
+    const AI_PROMPTS_KEY = "aiPrompts_v1.8.0";
 
     const DEFAULT_SUBJECTS = [
         { label: "國語", key: "Chinese" }, { label: "數學", key: "Math" },
@@ -336,12 +389,15 @@
 
     function getHierarchy() {
         const customSubjects = JSON.parse(localStorage.getItem(SUBJECTS_STORAGE_KEY) || "[]");
-        const allSubjects = [...DEFAULT_SUBJECTS, ...customSubjects];
         return [
             { level: 0, title: "選擇版本", options: [{ label: "翰林", key: "Hanlin" }, { label: "南一", key: "Nanyi" }, { label: "康軒", key: "Kangxuan" }] },
-            { level: 1, title: "選擇科目", options: allSubjects },
+            { level: 1, title: "選擇科目", options: [...DEFAULT_SUBJECTS, ...customSubjects] },
             { level: 2, title: "選擇學期", options: [{ label: "上學期", key: "S1" }, { label: "下學期", key: "S2" }] },
-            { level: 3, title: "選擇年級", options: [{ label: "一年級", key: "G1" }, { label: "二年級", key: "G2" }, { label: "三年級", key: "G3" }, { label: "四年級", key: "G4" }, { label: "五年級", key: "G5" }, { label: "六年級", key: "G6" }] }
+            { level: 3, title: "選擇年級", options: [
+                { label: "一年級", key: "G1" }, { label: "二年級", key: "G2" }, { label: "三年級", key: "G3" }, 
+                { label: "四年級", key: "G4" }, { label: "五年級", key: "G5" }, { label: "六年級", key: "G6" },
+                { label: "七年級", key: "G7" }, { label: "八年級", key: "G8" }, { label: "九年級", key: "G9" }
+            ]}
         ];
     }
         
@@ -367,51 +423,73 @@
         workspaceSwitcher: document.getElementById("workspaceSwitcher"), saveWorkspaceBtn: document.getElementById("saveWorkspaceBtn"),
         customSubName: document.getElementById("customSubjectName"), customSubId: document.getElementById("customSubjectId"),
         addCustomSubBtn: document.getElementById("addCustomSubjectBtn"), customSubList: document.getElementById("customSubjectList"),
-        shortcutList: document.getElementById("shortcutList"),
+        shortcutList: document.getElementById("shortcutList"), dynamicFieldsContainer: document.getElementById("dynamicFieldsContainer"),
+        addDynamicFieldBtn: document.getElementById("addDynamicFieldBtn"), saveDataBtn: document.getElementById("saveDataBtn"),
         
         btnExportBackup: document.getElementById("btnExportBackup"), btnImportBackup: document.getElementById("btnImportBackup"),
-        importJsonInput: document.getElementById("importJsonInput"), btnClearLevelA: document.getElementById("btnClearLevelA"),
-        btnClearLevelB: document.getElementById("btnClearLevelB"), btnClearLevelC: document.getElementById("btnClearLevelC")
+        importJsonInput: document.getElementById("importJsonInput"),
+        btnClearLevelC: document.getElementById("btnClearLevelC"),
+        
+        aiPromptsContainer: document.getElementById("aiPromptsContainer"), restoreDefaultPromptsBtn: document.getElementById("restoreDefaultPromptsBtn"),
+        addNewPromptBtn: document.getElementById("addNewPromptBtn"),
+        
+        // 新增的 AI 覆蓋下拉
+        aiOverridePublisher: document.getElementById("aiOverridePublisher"), aiOverrideSubject: document.getElementById("aiOverrideSubject"),
+        aiOverrideSemester: document.getElementById("aiOverrideSemester"), aiOverrideGrade: document.getElementById("aiOverrideGrade"),
+        
+        // 刪除相關獨立下拉
+        delPublisher: document.getElementById("delPublisher"), delSubject: document.getElementById("delSubject"),
+        delSemester: document.getElementById("delSemester"), delGrade: document.getElementById("delGrade"),
+        btnFetchDelUnits: document.getElementById("btnFetchDelUnits"), delUnitSelector: document.getElementById("delUnitSelector"),
+        btnDeleteSingle: document.getElementById("btnDeleteSingle"), btnDeleteSemester: document.getElementById("btnDeleteSemester"),
+        
+        btnClearAI: document.getElementById("btnClearAI"), btnClearEdit: document.getElementById("btnClearEdit")
     };
     
     function showToast(message, type = 'success') {
         if(type === 'success' || type === 'info') playSound('success'); else playSound('error');
         dom.toastMessage.innerHTML = type === 'error' ? `⚠️ ${message}` : message;
         dom.toast.className = `fixed top-5 left-1/2 transform -translate-x-1/2 -translate-y-20 text-white py-3 px-8 rounded-full shadow-2xl transition-all duration-300 opacity-0 z-50 font-bold tracking-wide border-2 border-white/20 ${type === 'error' ? 'bg-red-600' : (type === 'info' ? 'bg-gray-700' : 'bg-blue-600')}`;
-        
-        requestAnimationFrame(() => {
-            dom.toast.classList.remove('-translate-y-20', 'opacity-0'); dom.toast.classList.add('translate-y-0', 'opacity-100');
-        });
-        setTimeout(() => {
-            dom.toast.classList.remove('translate-y-0', 'opacity-100'); dom.toast.classList.add('-translate-y-20', 'opacity-0');
-        }, 3500);
+        requestAnimationFrame(() => { dom.toast.classList.remove('-translate-y-20', 'opacity-0'); dom.toast.classList.add('translate-y-0', 'opacity-100'); });
+        setTimeout(() => { dom.toast.classList.remove('translate-y-0', 'opacity-100'); dom.toast.classList.add('-translate-y-20', 'opacity-0'); }, 3500);
     }
+
+    /* --- Tab Navigation Logic --- */
+    document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            playSound('click');
+            document.querySelectorAll('.admin-tab-btn').forEach(b => { b.classList.remove('active'); });
+            btn.classList.add('active');
+            
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
+            document.getElementById(btn.dataset.tab).classList.remove('hidden');
+            document.getElementById(btn.dataset.tab).classList.add('flex'); 
+            
+            if (btn.dataset.tab === 'tab-content') dom.saveDataBtn.classList.remove('hidden');
+            else dom.saveDataBtn.classList.add('hidden');
+        });
+    });
 
     /* --- Shortcuts & Custom Subjects --- */
     function loadWorkspaceSwitcher() {
         const shortcuts = JSON.parse(localStorage.getItem(SHORTCUTS_STORAGE_KEY) || "{}");
-        const switcher = dom.workspaceSwitcher;
-        if (Object.keys(shortcuts).length === 0) { switcher.classList.add("hidden"); return; }
-        switcher.classList.remove("hidden"); switcher.innerHTML = '<option value="">🏫 快速切換教學區...</option>';
+        if (Object.keys(shortcuts).length === 0) { dom.workspaceSwitcher.classList.add("hidden"); return; }
+        dom.workspaceSwitcher.classList.remove("hidden"); dom.workspaceSwitcher.innerHTML = '<option value="">🏫 快速切換教學區...</option>';
         Object.entries(shortcuts).forEach(([pathStr, labelStr]) => {
             const opt = document.createElement("option"); opt.value = pathStr; opt.textContent = `⭐ ${labelStr}`;
-            switcher.appendChild(opt);
+            dom.workspaceSwitcher.appendChild(opt);
         });
-        switcher.onchange = (e) => {
+        dom.workspaceSwitcher.onchange = (e) => {
             if (!e.target.value) return; playSound('click');
-            const pathStr = e.target.value; const pathParts = pathStr.split("_"); const labelStr = shortcuts[pathStr];
-            localStorage.setItem(LAST_WORKSPACE_KEY, pathStr); currentPathParts = pathParts; currentLabels = labelStr.split(" / ");
-            currentDocCache = {}; renderNavigator(4); showToast(`🚀 已切換至：${labelStr}`, "info"); switcher.value = "";
+            const pathStr = e.target.value; localStorage.setItem(LAST_WORKSPACE_KEY, pathStr); 
+            currentPathParts = pathStr.split("_"); currentLabels = shortcuts[pathStr].split(" / ");
+            currentDocCache = {}; renderNavigator(4); showToast(`🚀 已切換至：${shortcuts[pathStr]}`, "info"); e.target.value = "";
         };
     }
     function updateShortcutButtonState() {
-        if (currentPathParts.length !== 4) { dom.saveWorkspaceBtn.classList.add("hidden"); return; }
+        if (currentPathParts.length !== 4) return dom.saveWorkspaceBtn.classList.add("hidden");
         dom.saveWorkspaceBtn.classList.remove("hidden");
-        const pathStr = currentPathParts.join("_"); 
-        const shortcuts = JSON.parse(localStorage.getItem(SHORTCUTS_STORAGE_KEY) || "{}");
-        
-        dom.saveWorkspaceBtn.innerHTML = ""; 
-        
+        const pathStr = currentPathParts.join("_"); const shortcuts = JSON.parse(localStorage.getItem(SHORTCUTS_STORAGE_KEY) || "{}");
         if (shortcuts[pathStr]) {
             dom.saveWorkspaceBtn.className = "btn-shortcut-saved border font-bold py-1 px-3 rounded shadow-sm text-sm transition-all transform hover:scale-105 active:scale-95";
         } else {
@@ -419,60 +497,40 @@
             dom.saveWorkspaceBtn.className = "bg-yellow-100 hover:bg-yellow-200 text-yellow-800 border border-yellow-300 font-bold py-1 px-3 rounded shadow-sm text-sm transition-all transform hover:scale-105 active:scale-95";
         }
     }
-
     function toggleWorkspaceShortcut() {
         playSound('click'); if (currentPathParts.length !== 4) return;
         const pathStr = currentPathParts.join("_"); const labelStr = currentLabels.join(" / ");
         let shortcuts = JSON.parse(localStorage.getItem(SHORTCUTS_STORAGE_KEY) || "{}");
-        
         if (shortcuts[pathStr]) {
-            delete shortcuts[pathStr];
-            if(localStorage.getItem(LAST_WORKSPACE_KEY) === pathStr) localStorage.removeItem(LAST_WORKSPACE_KEY);
+            delete shortcuts[pathStr]; if(localStorage.getItem(LAST_WORKSPACE_KEY) === pathStr) localStorage.removeItem(LAST_WORKSPACE_KEY);
             showToast("❌ 已取消常用教學區", "info");
         } else {
-            shortcuts[pathStr] = labelStr; 
-            localStorage.setItem(LAST_WORKSPACE_KEY, pathStr);
-            showToast("🌟 已成功設為常用教學區！", "success");
+            shortcuts[pathStr] = labelStr; localStorage.setItem(LAST_WORKSPACE_KEY, pathStr); showToast("🌟 已成功設為常用教學區！", "success");
         }
         localStorage.setItem(SHORTCUTS_STORAGE_KEY, JSON.stringify(shortcuts));
         loadWorkspaceSwitcher(); loadShortcutsUI(); updateShortcutButtonState();
     }
-
     function loadShortcutsUI() {
-        if (!dom.shortcutList) return;
-        const shortcuts = JSON.parse(localStorage.getItem(SHORTCUTS_STORAGE_KEY) || "{}");
+        if (!dom.shortcutList) return; const shortcuts = JSON.parse(localStorage.getItem(SHORTCUTS_STORAGE_KEY) || "{}");
         dom.shortcutList.innerHTML = Object.keys(shortcuts).length === 0 ? "<span class='text-gray-400 text-sm'>尚無常用教學區</span>" : "";
         Object.entries(shortcuts).forEach(([pathStr, labelStr]) => {
-            const span = document.createElement("span"); 
-            span.id = `shortcut-item-${pathStr}`;
+            const span = document.createElement("span"); span.id = `shortcut-item-${pathStr}`;
             span.className = "inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800 border border-orange-200 shadow-sm transition-all duration-300";
             span.innerHTML = `${labelStr} <button class="ml-2 text-orange-900 hover:text-red-500 font-bold transform hover:scale-110 transition-transform" onclick="removeAdminShortcut('${pathStr}')">&times;</button>`;
             dom.shortcutList.appendChild(span);
         });
     }
-
     window.removeAdminShortcut = function(pathStr) {
-        playSound('error'); 
-        const el = document.getElementById(`shortcut-item-${pathStr}`);
-        if(el) {
-            el.classList.add('shortcut-item-exit');
-            setTimeout(() => {
-                executeRemoveShortcut(pathStr);
-            }, 250); 
-        } else {
-            executeRemoveShortcut(pathStr);
-        }
+        playSound('error'); const el = document.getElementById(`shortcut-item-${pathStr}`);
+        if(el) { el.classList.add('shortcut-item-exit'); setTimeout(() => { executeRemoveShortcut(pathStr); }, 250); } 
+        else executeRemoveShortcut(pathStr);
     };
-    
     function executeRemoveShortcut(pathStr) {
-        let shortcuts = JSON.parse(localStorage.getItem(SHORTCUTS_STORAGE_KEY) || "{}");
-        delete shortcuts[pathStr];
+        let shortcuts = JSON.parse(localStorage.getItem(SHORTCUTS_STORAGE_KEY) || "{}"); delete shortcuts[pathStr];
         localStorage.setItem(SHORTCUTS_STORAGE_KEY, JSON.stringify(shortcuts));
         if(localStorage.getItem(LAST_WORKSPACE_KEY) === pathStr) localStorage.removeItem(LAST_WORKSPACE_KEY);
-        showToast("🗑️ 已從清單移除", "info"); 
-        loadShortcutsUI(); loadWorkspaceSwitcher(); updateShortcutButtonState();
+        showToast("🗑️ 已從清單移除", "info"); loadShortcutsUI(); loadWorkspaceSwitcher(); updateShortcutButtonState();
     }
-
     function loadCustomSubjectsUI() {
         const customSubjects = JSON.parse(localStorage.getItem(SUBJECTS_STORAGE_KEY) || "[]");
         dom.customSubList.innerHTML = customSubjects.length === 0 ? "<span class='text-gray-400 text-sm'>尚無自訂科目</span>" : "";
@@ -496,12 +554,30 @@
         localStorage.setItem(SUBJECTS_STORAGE_KEY, JSON.stringify(customSubjects.filter(s => s.key !== key)));
         showToast("🗑️ 已移除", "info"); loadCustomSubjectsUI();
     };
+
+    // 同步更新所有科目選單
     function updateAdminSubjectDropdown() {
-        const adminSub = document.getElementById("adminSubject"); const curr = adminSub.value; adminSub.innerHTML = "";
+        const adminSub = document.getElementById("adminSubject");
+        const aiSub = document.getElementById("aiOverrideSubject");
+        const delSub = document.getElementById("delSubject");
+        
+        const currAdmin = adminSub.value;
+        const currAi = aiSub.value;
+        const currDel = delSub.value;
+        
+        adminSub.innerHTML = "";
+        aiSub.innerHTML = '<option value="">🤖 AI 自動判斷</option>';
+        delSub.innerHTML = "";
+        
         getHierarchy()[1].options.forEach(sub => {
-            const opt = document.createElement("option"); opt.value = sub.key; opt.textContent = sub.label; adminSub.appendChild(opt);
+            adminSub.appendChild(new Option(sub.label, sub.key));
+            aiSub.appendChild(new Option(sub.label, sub.key));
+            delSub.appendChild(new Option(sub.label, sub.key));
         });
-        if([...adminSub.options].some(o => o.value === curr)) adminSub.value = curr;
+        
+        if([...adminSub.options].some(o => o.value === currAdmin)) adminSub.value = currAdmin;
+        if([...aiSub.options].some(o => o.value === currAi)) aiSub.value = currAi;
+        if([...delSub.options].some(o => o.value === currDel)) delSub.value = currDel;
     }
 
     /* --- Navigation & Core Display --- */
@@ -511,11 +587,11 @@
         try {
             const snap = await db.collection(CURRICULUM_COLLECTION).get();
             existingPaths.clear(); snap.forEach(doc => existingPaths.add(doc.id));
-            if (existingPaths.size === 0) { renderNavigator(0); } else {
+            if (existingPaths.size === 0) renderNavigator(0); else {
                 const last = localStorage.getItem(LAST_WORKSPACE_KEY); const shortcuts = JSON.parse(localStorage.getItem(SHORTCUTS_STORAGE_KEY) || "{}");
                 if (last && shortcuts[last] && checkAvailability(last + "_")) {
                     currentPathParts = last.split("_"); currentLabels = shortcuts[last].split(" / "); renderNavigator(4);
-                } else { renderNavigator(0); }
+                } else renderNavigator(0);
             }
         } catch (e) { showToast("❌ Firebase 連線失敗", "error"); } 
         finally { dom.loading.classList.add("hidden"); dom.navigator.classList.remove("hidden"); }
@@ -531,10 +607,7 @@
     async function renderNavigator(level) {
         dom.navigator.innerHTML = ""; dom.contentArea.classList.add("hidden"); 
         const currentHierarchy = getHierarchy(); updateBreadcrumb(level);
-
-        if (level === currentHierarchy.length) {
-            updateShortcutButtonState();
-        } else { dom.saveWorkspaceBtn.classList.add("hidden"); }
+        if (level === currentHierarchy.length) updateShortcutButtonState(); else dom.saveWorkspaceBtn.classList.add("hidden");
 
         if (level < currentHierarchy.length) {
             const step = currentHierarchy[level]; const prefix = currentPathParts.join("_") + (currentPathParts.length > 0 ? "_" : "");
@@ -562,7 +635,7 @@
             }
             dom.loading.classList.add("hidden"); const units = [];
             Object.keys(currentDocCache).forEach(id => { if (id.startsWith(prefix)) units.push({ unitId: id.replace(prefix, ""), docId: id }); });
-            if (units.length === 0) { dom.navigator.innerHTML = `<p class="text-gray-500 col-span-full text-center text-lg p-10 bg-gray-50 rounded-lg border border-dashed">尚無資料。</p>`; return; }
+            if (units.length === 0) return dom.navigator.innerHTML = `<p class="text-gray-500 col-span-full text-center text-lg p-10 bg-gray-50 rounded-lg border border-dashed">尚無資料。</p>`;
             units.sort((a, b) => { const nA = getSortValue(a.unitId); const nB = getSortValue(b.unitId); return nA!==nB ? nA-nB : a.unitId.localeCompare(b.unitId); });
             units.forEach(({ unitId }) => {
                 const btn = document.createElement("button"); btn.className = "nav-button border-l-4 border-green-500";
@@ -599,6 +672,7 @@
     function renderContentFields() {
         const data = currentDocCache[currentPathParts.join("_")]; let hasContent = false;
         if (!data?.content) return dom.navigator.innerHTML = `<p class="text-gray-500 col-span-full text-center">內容為空。</p>`;
+        
         (data.content.fields||[]).forEach(f => {
             if (f.label && f.data?.length > 0) { 
                 const btn = document.createElement("button"); btn.className = "nav-button border-l-4 border-indigo-500 bg-indigo-50";
@@ -607,14 +681,17 @@
                 dom.navigator.appendChild(btn); hasContent = true;
             }
         });
+        
         if (data.content.mainText) {
              const btn = document.createElement("button"); btn.className = "nav-button border-l-4 border-indigo-500 bg-indigo-50";
-             btn.innerHTML = `<span class="text-xl font-bold text-indigo-800">主要內容 (大長篇)</span>`;
+             btn.innerHTML = `<span class="text-xl font-bold text-indigo-800">主要內容 (大段落)</span>`;
              btn.onclick = () => { playSound('click'); showData("主要內容", data.content.mainText); };
              dom.navigator.appendChild(btn); hasContent = true;
         }
+        
         if (!hasContent) dom.navigator.innerHTML = `<p class="text-gray-500 col-span-full text-center">此單元內容為空。</p>`;
     }
+    
     function showData(label, content) {
         dom.contentTitle.innerHTML = `<span class="text-indigo-600 font-black">${currentLabels.join(" > ")}</span> <br/><span class="text-gray-500 text-lg">📌 ${label}</span>`;
         dom.contentTextArea.value = Array.isArray(content) ? content.join("\n") : (content || "");
@@ -624,7 +701,36 @@
         };
     }
 
-    /* --- Admin & Setup --- */
+    /* --- 動態欄位系統 (Dynamic Fields) --- */
+    function renderFieldsToDOM(fieldsArr) {
+        dom.dynamicFieldsContainer.innerHTML = '';
+        fieldsArr.forEach(f => addFieldToDOM(f.label, f.data));
+        if (fieldsArr.length === 0) addFieldToDOM('', []); 
+    }
+    
+    function addFieldToDOM(label, data) {
+        const div = document.createElement('div');
+        div.className = "bg-gray-50 p-3 rounded-lg border border-gray-200 focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-400 transition-all relative dynamic-field-group shadow-sm";
+        
+        const dataText = Array.isArray(data) ? data.join('\n') : (data || "");
+        
+        div.innerHTML = `
+            <div class="flex justify-between items-center mb-1">
+                <input type="text" class="w-2/3 p-1 border-b border-gray-300 bg-transparent text-sm font-bold focus:outline-none focus:border-blue-500 field-label text-blue-800" placeholder="欄位標題 (例: 生字、課文)" value="${label}">
+                <button type="button" class="text-xs px-2 py-1 bg-red-100 text-red-600 hover:bg-red-200 rounded font-semibold transition-colors btn-remove-field">🗑️ 移除</button>
+            </div>
+            <textarea rows="4" class="w-full p-2 border border-gray-300 rounded text-sm bg-white focus:outline-none field-content resize-y" placeholder="請填寫內容 (每行一筆，或貼上長篇文章)...">${dataText}</textarea>
+        `;
+        
+        div.querySelector('.btn-remove-field').onclick = () => { playSound('click'); div.remove(); };
+        dom.dynamicFieldsContainer.appendChild(div);
+    }
+    
+    dom.addDynamicFieldBtn.addEventListener("click", () => {
+        playSound('click'); addFieldToDOM('', []);
+    });
+
+    /* --- Admin Logic --- */
     function saveAiSettings() {
         playSound('click'); const apiKey = document.getElementById("googleAiApiKey").value.trim();
         const modelName = document.getElementById("googleAiModelName").value.trim();
@@ -652,9 +758,7 @@
             publisher: document.getElementById("adminPublisher"), subject: document.getElementById("adminSubject"),
             semester: document.getElementById("adminSemester"), grade: document.getElementById("adminGrade"),
             unitId: document.getElementById("adminUnitId"), unitSelector: document.getElementById("adminUnitSelector"),
-            labels: [1,2,3,4,5].map(i => document.getElementById(`adminLabel${i}`)),
-            contents: [1,2,3,4,5].map(i => document.getElementById(`adminContent${i}`)),
-            mainText: document.getElementById("adminMainText"), docIdPreview: document.getElementById("adminDocIdPreview"),
+            docIdPreview: document.getElementById("adminDocIdPreview"),
         };
     }
     function getAdminDocId() {
@@ -685,45 +789,54 @@
             updateAdminDocIdPreview();
         } catch(e) { f.unitSelector.innerHTML = '<option value="">❌ 失敗</option>'; }
     }
+    
     async function handleLoadData() {
         playSound('click'); const docId = getAdminDocId(); if(!docId) return showToast("⚠️ 請指定單元", "error");
-        const f = getAdminFormObj(); f.labels.forEach(i=>i.value=""); f.contents.forEach(i=>i.value=""); f.mainText.value="";
+        dom.dynamicFieldsContainer.innerHTML = '';
         try {
             const snap = await db.collection(CURRICULUM_COLLECTION).doc(docId).get();
-            if(snap.exists && snap.data().content) {
-                const data = snap.data().content;
-                (data.fields||[]).forEach((fd, i) => { if(i < f.labels.length) { f.labels[i].value = fd.label||""; f.contents[i].value = (fd.data||[]).join("\n"); } });
-                f.mainText.value = data.mainText||""; showToast("✅ 資料載入成功");
-            } else showToast("ℹ️ 新資料無內容", "info");
-        } catch(e) { showToast("❌ 載入失敗", "error"); }
+            if (snap.exists && snap.data().content) {
+                let data = snap.data().content;
+                let fieldsToRender = data.fields ? [...data.fields] : [];
+                if (data.mainText && !fieldsToRender.find(f => f.label === '課文' || f.label === '主要內容')) {
+                    fieldsToRender.push({ label: '課文', data: [data.mainText] });
+                }
+                renderFieldsToDOM(fieldsToRender); showToast("✅ 資料載入成功");
+            } else {
+                renderFieldsToDOM([]); showToast("ℹ️ 新資料無內容", "info");
+            }
+        } catch(e) { showToast("❌ 載入失敗", "error"); renderFieldsToDOM([]); }
     }
+    
     async function handleSaveData() {
         playSound('click'); const docId = getAdminDocId(); if(!docId) return showToast("⚠️ 請指定單元", "error");
-        const f = getAdminFormObj(); let newFields = [];
-        f.labels.forEach((lbl, i) => {
-            const v = lbl.value.trim(); const c = f.contents[i].value.trim();
-            if(v) newFields.push({label:v, data: c.split('\n').map(s=>s.trim()).filter(Boolean)});
+        
+        let newFields = [];
+        document.querySelectorAll('.dynamic-field-group').forEach(group => {
+            const lbl = group.querySelector('.field-label').value.trim();
+            const content = group.querySelector('.field-content').value.trim();
+            if (lbl && content) {
+                newFields.push({ label: lbl, data: content.split('\n').map(s=>s.trim()).filter(Boolean) });
+            }
         });
+        
         try {
             await db.collection(CURRICULUM_COLLECTION).doc(docId).set({
-                id: docId, publisher: f.publisher.value, subject: f.subject.value, semester: f.semester.value, grade: f.grade.value, unit: docId.split('_').pop(), 
-                content: { mainText: f.mainText.value.trim(), fields: newFields }, lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                id: docId, publisher: getAdminFormObj().publisher.value, subject: getAdminFormObj().subject.value, 
+                semester: getAdminFormObj().semester.value, grade: getAdminFormObj().grade.value, unit: docId.split('_').pop(), 
+                content: { fields: newFields }, lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
             });
             existingPaths.add(docId); showToast("✅ 儲存成功！"); dom.adminModal.classList.remove("visible"); dom.adminModal.classList.add("hidden");
             currentDocCache = {}; renderNavigator(currentPathParts.length);
         } catch(e) { showToast("❌ 儲存失敗", "error"); }
     }
-    async function handleDeleteDocument() {
-        playSound('error'); const docId = getAdminDocId(); if(!docId) return showToast("⚠️ 請選擇單元", "error");
-        if(!confirm(`⚠️ 確定刪除此課 [${docId}] 嗎？`)) return;
-        try {
-            await db.collection(CURRICULUM_COLLECTION).doc(docId).delete();
-            existingPaths.delete(docId); delete currentDocCache[docId]; showToast("🗑️ 已刪除", "success");
-            f.unitId.value = ""; f.labels.forEach(i=>i.value=""); f.contents.forEach(i=>i.value="");
-            currentDocCache = {}; renderNavigator(Math.min(currentPathParts.length, getHierarchy().length));
-        } catch(e) { showToast("❌ 刪除失敗", "error"); }
+    
+    function openAdminModal() { 
+        playSound('click'); dom.adminModal.classList.add("visible"); dom.adminModal.classList.remove("hidden"); 
+        loadAiSettingsStatus(); loadShortcutsUI(); loadAiPromptsUI();
+        document.querySelector('.admin-tab-btn[data-tab="tab-content"]').click();
     }
-    function openAdminModal() { playSound('click'); dom.adminModal.classList.add("visible"); dom.adminModal.classList.remove("hidden"); loadAiSettingsStatus(); loadShortcutsUI(); }
+
 
     /* --- 🗄️ 資料維護與安全清理功能 --- */
     async function exportBackup(prefixName = "雲教室教材備份") {
@@ -739,169 +852,208 @@
             const dateStr = new Date().toISOString().slice(0,10).replace(/-/g, '');
             a.href = url; a.download = `${prefixName}_${dateStr}.json`;
             a.click(); URL.revokeObjectURL(url);
-            
-            showToast(`📦 ${prefixName} 下載成功！`, "success");
-            return true;
-        } catch(e) { showToast("❌ 備份失敗", "error"); console.error(e); return false; }
+            showToast(`📦 ${prefixName} 下載成功！`, "success"); return true;
+        } catch(e) { showToast("❌ 備份失敗", "error"); return false; }
     }
-
+    
     dom.btnExportBackup.addEventListener('click', () => { playSound('click'); exportBackup(); });
-
     dom.btnImportBackup.addEventListener('click', () => { playSound('click'); dom.importJsonInput.click(); });
     dom.importJsonInput.addEventListener('change', (e) => {
-        const file = e.target.files[0]; if (!file) return;
-        const reader = new FileReader();
+        const file = e.target.files[0]; if (!file) return; const reader = new FileReader();
         reader.onload = async (event) => {
             try {
-                const importedData = JSON.parse(event.target.result);
-                if(!Array.isArray(importedData)) throw new Error("非陣列格式");
-                
+                const importedData = JSON.parse(event.target.result); if(!Array.isArray(importedData)) throw new Error("非陣列格式");
                 if(confirm(`📦 成功讀取備份檔！包含 ${importedData.length} 筆資料。\n⚠️ 匯入將「覆寫」現有同名單元資料，確定要開始還原嗎？`)) {
                     showToast("⏳ 雲端批次寫入中，請勿關閉...", "info");
-                    
                     let batch = db.batch(); let count = 0;
                     for (const item of importedData) {
                         if(item.id && item.content) {
-                            const docRef = db.collection(CURRICULUM_COLLECTION).doc(item.id);
-                            batch.set(docRef, item); existingPaths.add(item.id); count++;
+                            batch.set(db.collection(CURRICULUM_COLLECTION).doc(item.id), item); existingPaths.add(item.id); count++;
                             if (count % 490 === 0) { await batch.commit(); batch = db.batch(); }
                         }
                     }
                     if (count % 490 !== 0) await batch.commit();
-                    
-                    showToast(`✅ 成功還原 ${count} 筆單元資料！`, "success");
-                    currentDocCache = {}; renderNavigator(currentPathParts.length);
+                    showToast(`✅ 成功還原 ${count} 筆單元資料！`, "success"); currentDocCache = {}; renderNavigator(currentPathParts.length);
                 }
-            } catch(err) { showToast("❌ 檔案解析失敗，非有效備份檔", "error"); }
+            } catch(err) { showToast("❌ 檔案解析失敗", "error"); }
             e.target.value = ''; 
-        };
-        reader.readAsText(file);
+        }; reader.readAsText(file);
     });
 
-    dom.btnClearLevelA.addEventListener('click', () => {
+    // 獨立清空邏輯 (分頁 1)
+    dom.btnClearAI.addEventListener('click', () => {
         playSound('click');
         dom.aiResultPreviewDynamic.innerHTML = ''; dom.aiPreviewArea.classList.add('hidden');
         dom.batchLog.innerHTML = ''; dom.batchLog.classList.add('hidden');
         dom.textInputArea.value = ''; dom.fileUploadInput.value = '';
-        
-        const f = getAdminFormObj();
-        f.labels.forEach(i=>i.value=""); f.contents.forEach(i=>i.value=""); f.mainText.value="";
-        showAdminUnitInput();
-        showToast("🧹 編輯面板與暫存已完全清空", "success");
+        dom.aiOverridePublisher.value = ''; dom.aiOverrideSubject.value = ''; dom.aiOverrideSemester.value = ''; dom.aiOverrideGrade.value = '';
+        showToast("🧹 AI 暫存區已清空", "success");
+    });
+    
+    dom.btnClearEdit.addEventListener('click', () => {
+        playSound('click');
+        dom.dynamicFieldsContainer.innerHTML = ''; addFieldToDOM('', []);
+        showAdminUnitInput(); showToast("🧹 編輯面板已清空", "success");
     });
 
-    dom.btnClearLevelB.addEventListener('click', async () => {
-        playSound('error'); const f = getAdminFormObj();
-        const prefix = [f.publisher.value, f.subject.value, f.semester.value, f.grade.value].join("_");
-        const targetName = `${f.publisher.options[f.publisher.selectedIndex].text}_${f.subject.options[f.subject.selectedIndex].text}_${f.semester.options[f.semester.selectedIndex].text}_${f.grade.options[f.grade.selectedIndex].text}`;
-        
-        const userInput = prompt(`⚠️ 即將刪除整個 [${targetName}] 學期的所有單元！\n此動作無法復原。請輸入「確認」以繼續。`);
-        if(userInput !== "確認") return;
+    // 獨立防呆刪除邏輯 (分頁 2)
+    dom.btnFetchDelUnits.addEventListener('click', async () => {
+        playSound('click');
+        const prefix = [dom.delPublisher.value, dom.delSubject.value, dom.delSemester.value, dom.delGrade.value].join("_") + "_";
+        showToast(`🔄 偵測中...`, "info");
+        dom.delUnitSelector.classList.remove('hidden'); dom.delUnitSelector.innerHTML = '<option value="">偵測中...</option>';
+        try {
+            const qs = await db.collection(CURRICULUM_COLLECTION).where(firebase.firestore.FieldPath.documentId(), ">=", prefix).where(firebase.firestore.FieldPath.documentId(), "<", prefix + "\uf8ff").get();
+            if(qs.empty) {
+                dom.delUnitSelector.innerHTML = '<option value="">無單元</option>'; dom.btnDeleteSingle.classList.add('hidden'); return;
+            }
+            let units = []; qs.forEach(d => units.push(d.id.replace(prefix,""))); units.sort((a,b) => getSortValue(a)-getSortValue(b));
+            dom.delUnitSelector.innerHTML = '<option value="">👉 選擇單元進行刪除...</option>' + units.map(u => `<option value="${u}">${u}</option>`).join("");
+            dom.btnDeleteSingle.classList.remove('hidden');
+        } catch(e) { dom.delUnitSelector.innerHTML = '<option value="">❌ 失敗</option>'; }
+    });
 
+    dom.btnDeleteSingle.addEventListener('click', async () => {
+        playSound('error'); const unit = dom.delUnitSelector.value;
+        if(!unit) return showToast("⚠️ 請先在上方清單選擇單元", "error");
+        const docId = [dom.delPublisher.value, dom.delSubject.value, dom.delSemester.value, dom.delGrade.value, unit].join("_");
+        
+        if(!confirm(`⚠️ 確定要徹底刪除此單元 [ ${docId} ] 嗎？\n動作無法復原！`)) return;
+        try {
+            await db.collection(CURRICULUM_COLLECTION).doc(docId).delete();
+            existingPaths.delete(docId); delete currentDocCache[docId]; showToast("🗑️ 單元已成功刪除", "success");
+            dom.btnFetchDelUnits.click(); // 重新整理下拉清單
+            currentDocCache = {}; renderNavigator(Math.min(currentPathParts.length, getHierarchy().length));
+        } catch(e) { showToast("❌ 刪除失敗", "error"); }
+    });
+
+    dom.btnDeleteSemester.addEventListener('click', async () => {
+        playSound('error'); 
+        const prefix = [dom.delPublisher.value, dom.delSubject.value, dom.delSemester.value, dom.delGrade.value].join("_");
+        const targetName = `${dom.delPublisher.options[dom.delPublisher.selectedIndex].text} ${dom.delSubject.options[dom.delSubject.selectedIndex].text} ${dom.delSemester.options[dom.delSemester.selectedIndex].text} ${dom.delGrade.options[dom.delGrade.selectedIndex].text}`;
+        
+        const userInput = prompt(`⚠️ 即將刪除整個 [ ${targetName} ] 學期的所有單元！\n此動作無法復原。請輸入「確認」以繼續。`);
+        if(userInput !== "確認") return;
         try {
             showToast("⏳ 批次刪除中...", "info");
-            const snap = await db.collection(CURRICULUM_COLLECTION)
-                .where(firebase.firestore.FieldPath.documentId(), ">=", prefix + "_")
-                .where(firebase.firestore.FieldPath.documentId(), "<", prefix + "_\uf8ff").get();
-            
+            const snap = await db.collection(CURRICULUM_COLLECTION).where(firebase.firestore.FieldPath.documentId(), ">=", prefix + "_").where(firebase.firestore.FieldPath.documentId(), "<", prefix + "_\uf8ff").get();
             let batch = db.batch(); let count = 0;
             snap.forEach(doc => { batch.delete(doc.ref); existingPaths.delete(doc.id); count++; });
             await batch.commit();
-
-            showToast(`🗑️ 已成功刪除該學期的 ${count} 筆資料`, "success");
+            showToast(`🗑️ 已成功刪除該學期的 ${count} 筆資料`, "success"); 
+            dom.delUnitSelector.classList.add('hidden'); dom.btnDeleteSingle.classList.add('hidden');
             currentDocCache = {}; renderNavigator(Math.min(currentPathParts.length, 4));
-        } catch(e) { showToast("❌ 刪除失敗", "error"); console.error(e); }
+        } catch(e) { showToast("❌ 刪除失敗", "error"); }
     });
 
     dom.btnClearLevelC.addEventListener('click', async () => {
-        playSound('error');
-        alert("☢️ 準備執行原廠重置！\n系統將先強制下載完整備份，接著徹底清空所有雲端與本機設定資料。");
-
-        const backupSuccess = await exportBackup("雲教室_重置前強制備份");
-        if (!backupSuccess) return;
-
+        playSound('error'); alert("☢️ 準備執行原廠重置！\n系統將先強制下載完整備份，接著徹底清空所有雲端與本機設定資料。");
+        const backupSuccess = await exportBackup("雲教室_重置前強制備份"); if (!backupSuccess) return;
         const userInput = prompt(`⚠️ 備份已下載保護！\n您確定要徹底清空雲端資料庫並抹除本機設定嗎？請輸入「重置」`);
-        if (userInput !== "重置") { showToast("已取消重置操作", "info"); return; }
-
+        if (userInput !== "重置") return showToast("已取消重置操作", "info");
         try {
             showToast("⏳ 正在摧毀雲端資料...", "info");
             const snap = await db.collection(CURRICULUM_COLLECTION).get();
             let batch = db.batch(); let count = 0;
-            for(const doc of snap.docs) {
-                batch.delete(doc.ref); count++;
-                if(count % 490 === 0) { await batch.commit(); batch = db.batch(); }
-            }
+            for(const doc of snap.docs) { batch.delete(doc.ref); count++; if(count % 490 === 0) { await batch.commit(); batch = db.batch(); } }
             if(count % 490 !== 0) await batch.commit();
 
             showToast("⏳ 正在清空本機設定...", "info");
-            localStorage.removeItem(SUBJECTS_STORAGE_KEY);
-            localStorage.removeItem(SHORTCUTS_STORAGE_KEY);
-            localStorage.removeItem(LAST_WORKSPACE_KEY);
-            localStorage.removeItem(API_KEY_STORAGE_KEY);
-            localStorage.removeItem(API_MODEL_STORAGE_KEY);
-            sessionStorage.removeItem(ADMIN_AUTH_KEY);
-
+            localStorage.clear(); sessionStorage.clear();
             alert("✅ 原廠重置徹底完成！系統將重新載入。"); window.location.reload();
-        } catch(e) { showToast("❌ 重置過程發生錯誤", "error"); console.error(e); }
+        } catch(e) { showToast("❌ 重置過程發生錯誤", "error"); }
     });
 
 
-    /* --- AI Processing (v1.6.0 Restored & Optimized) --- */
-    const gradeMap = { '一': 'G1', '二': 'G2', '三': 'G3', '四': 'G4', '五': 'G5', '六': 'G6' };
-    const semesterMap = { '上': 'S1', '下': 'S2' };
-    const lessonMap = { '一': 'L1', '二': 'L2', '三': 'L3', '四': 'L4', '五': 'L5', '六': 'L6', '七': 'L7', '八': 'L8', '九': 'L9', '十': 'L10', '十一': 'L11', '十二': 'L12', '起': 'L1Z' };
-
-    const AI_BASE_PROMPT = `您是一個專業的資料分析師。請分析以下提供的文字，並**嚴格依照**指定的 JSON 格式回傳結果。
+    /* --- AI Processing & Prompts (動態模式與邏輯覆寫) --- */
+    function getDynamicAiPrompt() {
+        const subjects = getHierarchy()[1].options;
+        const subjectMapStr = subjects.map(s => `${s.label}->${s.key}`).join(", ");
+        return `您是一個專業的資料分析師。請分析以下提供的文字，並**嚴格依照**指定的 JSON 格式回傳結果。
 **重要規則：**
-1.  **年級/學期對應**：請使用此對應表：${JSON.stringify(gradeMap)} 和 ${JSON.stringify(semesterMap)}。
-2.  **課次對應**：請使用此對應表：${JSON.stringify(lessonMap)}。
-3.  **JSON 格式**：您的回覆**必須**是一個合法的 JSON 陣列，不包含任何 JSON 以外的說明文字。
----
-`;
+1. 版本對應：{"翰林":"Hanlin", "南一":"Nanyi", "康軒":"Kangxuan"}。
+2. 科目對應：${subjectMapStr}。
+3. 年級對應：{"一":"G1","二":"G2","三":"G3","四":"G4","五":"G5","六":"G6","七":"G7","八":"G8","九":"G9"}。
+4. 學期對應：{"上":"S1","下":"S2"}。
+5. 課次對應：{"一":"L1","二":"L2","三":"L3","四":"L4","五":"L5","六":"L6","七":"L7","八":"L8","九":"L9","十":"L10","十一":"L11","十二":"L12","起":"L1Z"}。
+6. 回傳欄位：陣列中的每個物件需包含 publisher(版本), subject(科目), grade(年級), semester(學期), lesson(課次), content(字串或字串陣列)。如果文中沒有明確提及版本與科目，請根據線索盡量推斷。
+7. 輸出限制：必須是合法的 JSON 陣列，絕不包含任何 JSON 以外的說明文字。
+---`;
+    }
 
-    const AI_PROMPT_SHENGZI = AI_BASE_PROMPT + `
-**任務**：分析單行密集型的生字資料。
-**輸出格式**：請回傳一個 JSON 陣列，格式如下 (生字內容請移除所有空格)：
-\`[
-  {"grade": "G5", "semester": "S1", "lesson": "L1", "content": "堅耐勞元蝟擁繩刷膏遭係充供凸彼協融洽諦"}
-]\`
----
-請開始分析以下資料：
-`;
+    const DEFAULT_AI_PROMPTS = [
+        {
+            id: "ai_shengzi", name: "📝 解析模式：生字 (單行密集)", targetLabel: "生字",
+            prompt: `**任務**：分析單行密集型的生字資料。\n**輸出格式**：請回傳 JSON 陣列，content 應為字串陣列 (生字請切開)。\n\`[\n  {"publisher":"Hanlin", "subject":"Chinese", "grade": "G5", "semester": "S1", "lesson": "L1", "content": ["堅", "定", "耐", "勞"]}\n]\``
+        },
+        {
+            id: "ai_lesson_text", name: "📖 解析模式：完整課文", targetLabel: "課文",
+            prompt: `**任務**：分析多段落的長文件，擷取出各課的完整課文。\n**輸出格式**：請回傳 JSON 陣列，content 應為單一字串陣列，將完整原文合併為單一元素。\n\`[\n  {"publisher":"Hanlin", "subject":"Chinese", "grade": "G5", "semester": "S1", "lesson": "L1", "content": ["第一課 你我之間..."]}\n]\``
+        },
+        {
+            id: "ai_terms", name: "🗣️ 解析模式：語詞 (區塊擷取)", targetLabel: "語詞",
+            prompt: `**任務**：分析備課資料，僅擷取 "■ 語詞解釋" 或類似區塊中的所有語詞。\n**輸出格式**：請回傳 JSON 陣列，content 應為包含所有語詞的字串陣列。\n\`[\n  {"publisher":"Hanlin", "subject":"Chinese", "grade": "G5", "semester": "S1", "lesson": "L1", "content": ["堅定", "耐勞", "多元"]}\n]\``
+        },
+        {
+            id: "ai_patterns", name: "🧩 解析模式：句型/短語 (結構化)", targetLabel: "句型練習",
+            prompt: `**任務**：擷取 "短語練習" 或 "句型練習" 的核心內容。可替換部分用全形括號「（）」包起來。\n**輸出格式**：請回傳 JSON 陣列，content 為字串陣列：\n\`[\n  {"publisher":"Hanlin", "subject":"Chinese", "grade": "G5", "semester": "S1", "lesson": "L3", "content": ["立下（「完璧歸趙」）的（奇功）"]}\n]\``
+        }
+    ];
 
-    const AI_PROMPT_LESSON_TEXT = AI_BASE_PROMPT + `
-**任務**：分析多段落的長文件，將每一課的完整課文擷取出來。
-**輸出格式**：請回傳一個 JSON 陣列，格式如下 (content 必須包含從 "第X課" 開始的完整原文)：
-\`[
-  {"grade": "G5", "semester": "S1", "lesson": "L1", "content": "第一課 你我之間 蔡仁偉... (完整內文與賞析)"}
-]\`
----
-請開始分析以下資料：
-`;
+    function getAiPrompts() {
+        let p = localStorage.getItem(AI_PROMPTS_KEY);
+        if (!p) { p = JSON.stringify(DEFAULT_AI_PROMPTS); localStorage.setItem(AI_PROMPTS_KEY, p); }
+        return JSON.parse(p);
+    }
+    
+    function loadAiPromptsUI() {
+        const prompts = getAiPrompts();
+        dom.aiPromptsContainer.innerHTML = '';
+        dom.analysisMode.innerHTML = ''; 
 
-    const AI_PROMPT_TERMS = AI_BASE_PROMPT + `
-**任務**：分析備課資料，僅擷取 "■ 語詞解釋" 區塊中的所有語詞。
-**輸出格式**：請回傳一個 JSON 陣列 (假設文件只針對一課)，content 應為一個包含所有語詞的字串陣列：
-\`[
-  {"grade": "G5", "semester": "S1", "lesson": "L1", "content": ["堅定", "耐勞", "多元", "刺蝟", "擁抱"]}
-]\`
----
-請開始分析以下資料：
-`;
+        prompts.forEach((p, idx) => {
+            const opt = document.createElement('option'); opt.value = p.id; opt.textContent = p.name;
+            dom.analysisMode.appendChild(opt);
 
-    const AI_PROMPT_PATTERNS = AI_BASE_PROMPT + `
-**任務**：分析備課資料，擷取 "短語練習"、"句型練習" 和 "造句練習" 的核心內容。
-**分析規則 (仿 v2.4.1 邏輯)：**
-1.  **短語練習**：找出課文例句 (例如：1. 立下「完璧歸趙」的奇功)，並參考其下的範本句 (例如：(1) 立下全國冠軍的成績)，找出可替換的詞，並只輸出課文例句，將可替換部分用全形括號「（）」包起來。 (例如：立下（「完璧歸趙」）的（奇功）)
-2.  **句型練習**：抽取出核心句構，用 ... 代表可變動的部分。 (例如：每到...時，...就...，以免...)
-3.  **造句練習**：只抽取出目標語詞本身 (例如：1. 羞辱)。 (例如：羞辱)
-**輸出格式**：請回傳一個 JSON 陣列 (假設文件只針對一課)，content 應為一個包含所有分析結果的**字串陣列**：
-\`[
-  {"grade": "G5", "semester": "S1", "lesson": "L3", "content": ["立下（「完璧歸趙」）的（奇功）", "這（件事）讓（廉頗）（十分）（不滿）", "每到...時，...就...，以免...", "連...都會怎麼樣，更何況...", "如果...，不是正好讓...？", "羞辱", "懦弱", "協助"]}
-]\`
----
-請開始分析以下資料：
-`;
+            const card = document.createElement('div');
+            card.className = "bg-white p-4 rounded-lg border border-gray-200 shadow-sm flex flex-col gap-3 transition-all hover:border-indigo-400";
+            card.innerHTML = `
+                <div class="flex gap-2">
+                    <div class="flex-1"><label class="block text-xs font-bold text-gray-500 mb-1">模式名稱</label><input type="text" class="w-full p-2 border rounded bg-gray-50 text-sm focus:ring-1 focus:ring-indigo-400 prompt-name" value="${p.name}"></div>
+                    <div class="w-32"><label class="block text-xs font-bold text-blue-600 mb-1">🎯 目標欄位</label><input type="text" class="w-full p-2 border border-blue-300 bg-blue-50 rounded text-sm font-bold text-blue-800 focus:ring-1 focus:ring-indigo-400 prompt-target" value="${p.targetLabel}" title="AI 解析後，會自動對應寫入此標題欄位"></div>
+                </div>
+                <div><label class="block text-xs font-bold text-gray-500 mb-1">任務目標與範例</label><textarea rows="5" class="w-full p-2 border rounded bg-gray-50 text-sm font-mono focus:ring-1 focus:ring-indigo-400 prompt-text">${p.prompt}</textarea></div>
+                <div class="flex justify-end gap-2 mt-auto pt-2 border-t">
+                    <button class="px-3 py-1.5 text-red-600 hover:bg-red-50 rounded text-sm font-bold transition-colors btn-del-prompt">刪除</button>
+                    <button class="px-4 py-1.5 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 rounded text-sm font-bold transition-colors btn-save-prompt">儲存變更</button>
+                </div>
+            `;
+            
+            card.querySelector('.btn-save-prompt').onclick = () => {
+                playSound('click'); p.name = card.querySelector('.prompt-name').value;
+                p.targetLabel = card.querySelector('.prompt-target').value; p.prompt = card.querySelector('.prompt-text').value;
+                localStorage.setItem(AI_PROMPTS_KEY, JSON.stringify(prompts)); loadAiPromptsUI(); showToast("✅ 提示詞已更新");
+            };
+            card.querySelector('.btn-del-prompt').onclick = () => {
+                playSound('error'); if(!confirm("確定要刪除此模式嗎？")) return;
+                prompts.splice(idx, 1); localStorage.setItem(AI_PROMPTS_KEY, JSON.stringify(prompts)); loadAiPromptsUI();
+            };
+            dom.aiPromptsContainer.appendChild(card);
+        });
+    }
+
+    dom.addNewPromptBtn.addEventListener('click', () => {
+        playSound('click'); const prompts = getAiPrompts();
+        prompts.push({ id: `custom_${Date.now()}`, name: "✨ 新解析模式", targetLabel: "自訂標題", prompt: "**任務**：請描述擷取邏輯...\n**輸出格式**：請回傳 JSON 陣列..." });
+        localStorage.setItem(AI_PROMPTS_KEY, JSON.stringify(prompts)); loadAiPromptsUI();
+        dom.aiPromptsContainer.scrollTop = dom.aiPromptsContainer.scrollHeight; 
+    });
+
+    dom.restoreDefaultPromptsBtn.addEventListener('click', () => {
+        playSound('error'); if(!confirm("⚠️ 確定要覆蓋所有目前的設定，恢復為出廠預設模式嗎？")) return;
+        localStorage.setItem(AI_PROMPTS_KEY, JSON.stringify(DEFAULT_AI_PROMPTS)); loadAiPromptsUI(); showToast("🔄 已恢復預設設定", "info");
+    });
+
 
     function logBatch(msg, type='info') {
         const p = document.createElement('p'); p.textContent = msg; p.className = type;
@@ -910,27 +1062,18 @@
     
     async function handleBatchUpload() {
         playSound('click'); const rawText = dom.textInputArea.value; if(!rawText.trim()) return showToast("⚠️ 沒有文字", "error");
-        const apiKey = localStorage.getItem(API_KEY_STORAGE_KEY); if(!apiKey) return showToast("⚠️ 請先設定 API 金鑰", "error");
+        const apiKey = localStorage.getItem(API_KEY_STORAGE_KEY); if(!apiKey) return showToast("⚠️ 請先至「AI 智能中心」設定 API 金鑰", "error");
         
         dom.batchLog.innerHTML = ""; dom.batchLog.classList.remove('hidden'); dom.aiPreviewArea.classList.add('hidden');
         dom.batchUploadBtn.disabled = true; dom.batchUploadBtn.textContent = "⏳ AI 高速運算中...";
         
-        // 判斷套用哪一個還原的強定義 Prompt
-        let promptToUse = "";
-        const mode = dom.analysisMode.value;
-        if (mode === "ai_shengzi") promptToUse = AI_PROMPT_SHENGZI;
-        else if (mode === "ai_lesson_text") promptToUse = AI_PROMPT_LESSON_TEXT;
-        else if (mode === "ai_terms") promptToUse = AI_PROMPT_TERMS;
-        else if (mode === "ai_patterns") promptToUse = AI_PROMPT_PATTERNS;
-        else promptToUse = AI_BASE_PROMPT;
-
-        // 結合 v1.7.2 的自訂額外指令
-        let fullPrompt = promptToUse;
+        const modeId = dom.analysisMode.value;
+        const activePromptConfig = getAiPrompts().find(p => p.id === modeId);
+        
+        let fullPrompt = getDynamicAiPrompt() + "\n" + (activePromptConfig ? activePromptConfig.prompt : "") + "\n";
         const extraP = dom.aiExtraPrompt.value.trim();
-        if (extraP) {
-            fullPrompt += `\n**額外指令 (優先度高)：**\n${extraP}\n--- (額外指令結束) ---\n`;
-        }
-        fullPrompt += "\n" + rawText;
+        if (extraP) fullPrompt += `\n**額外指令 (優先度最高)：**\n${extraP}\n--- (額外指令結束) ---\n`;
+        fullPrompt += "\n請開始分析以下資料：\n" + rawText;
 
         try {
             logBatch("⏳ 呼叫 AI 中...", "info");
@@ -938,10 +1081,29 @@
             const jsonStr = (await res.json()).candidates?.[0]?.content?.parts?.[0]?.text?.replace(/^```json\n/, '').replace(/\n```$/, '').trim();
             if(!jsonStr) throw new Error("無回應");
             
+            // 抓取強制指定的設定
+            const ovrPub = dom.aiOverridePublisher.value;
+            const ovrSub = dom.aiOverrideSubject.value;
+            const ovrSem = dom.aiOverrideSemester.value;
+            const ovrGra = dom.aiOverrideGrade.value;
+            
             dom.aiResultPreviewDynamic.innerHTML = '';
             JSON.parse(jsonStr).forEach((item) => {
+                const pub = ovrPub || item.publisher || '';
+                const sub = ovrSub || item.subject || '';
+                const sem = ovrSem || item.semester || '';
+                const gra = ovrGra || item.grade || '';
+                const les = item.lesson || '';
                 const cVal = Array.isArray(item.content) ? item.content.join('\n') : (item.content||'');
-                dom.aiResultPreviewDynamic.innerHTML += `<div class="ai-preview-box"><div><label>年級</label><input type="text" data-field="grade" value="${item.grade||''}"></div><div><label>學期</label><input type="text" data-field="semester" value="${item.semester||''}"></div><div class="md:col-span-2"><label>單元代號</label><input type="text" data-field="lesson" value="${item.lesson||''}"></div><div class="content-area"><label>內容</label><textarea data-field="content" rows="4">${cVal}</textarea></div></div>`;
+                
+                dom.aiResultPreviewDynamic.innerHTML += `<div class="ai-preview-box">
+                    <div><label>版本</label><input type="text" data-field="publisher" value="${pub}"></div>
+                    <div><label>科目</label><input type="text" data-field="subject" value="${sub}"></div>
+                    <div><label>年級</label><input type="text" data-field="grade" value="${gra}"></div>
+                    <div><label>學期</label><input type="text" data-field="semester" value="${sem}"></div>
+                    <div><label>單元代號 (必填)</label><input type="text" data-field="lesson" value="${les}" class="border-blue-400 bg-blue-50"></div>
+                    <div class="content-area"><label>內容預覽</label><textarea data-field="content" rows="4">${cVal}</textarea></div>
+                </div>`;
             });
             dom.aiPreviewArea.classList.remove('hidden'); logBatch("✅ 分析完成", "success"); playSound('success');
         } catch (e) { logBatch(`❌ 失敗: ${e.message}`, "error"); showToast("❌ 分析失敗", "error"); }
@@ -949,27 +1111,41 @@
     }
 
     async function handleConfirmBatchUpload() {
-        playSound('click'); const mode = dom.analysisMode.value;
+        playSound('click'); const modeId = dom.analysisMode.value;
+        const activePromptConfig = getAiPrompts().find(p => p.id === modeId);
+        const targetTitle = activePromptConfig ? activePromptConfig.targetLabel : "自訂AI內容";
+
         const parsedData = Array.from(dom.aiResultPreviewDynamic.querySelectorAll('.ai-preview-box')).map(b => ({
-            g: b.querySelector('input[data-field="grade"]').value.trim(), s: b.querySelector('input[data-field="semester"]').value.trim(),
+            p: b.querySelector('input[data-field="publisher"]').value.trim(), 
+            su: b.querySelector('input[data-field="subject"]').value.trim(),
+            g: b.querySelector('input[data-field="grade"]').value.trim(), 
+            s: b.querySelector('input[data-field="semester"]').value.trim(),
             l: b.querySelector('input[data-field="lesson"]').value.trim(),
-            c: (mode==='ai_terms'||mode==='ai_patterns') ? b.querySelector('textarea[data-field="content"]').value.split('\n').filter(Boolean) : b.querySelector('textarea[data-field="content"]').value
-        })).filter(i => i.g && i.s && i.l);
-        if(!parsedData.length) return;
+            c: b.querySelector('textarea[data-field="content"]').value.split('\n').filter(Boolean) 
+        })).filter(i => i.p && i.su && i.g && i.s && i.l);
         
-        dom.confirmBatchUploadBtn.disabled = true; dom.confirmBatchUploadBtn.textContent = "⏳ 寫入雲端中...";
+        if(!parsedData.length) return showToast("⚠️ 預覽區無有效資料(欄位不可為空)", "error");
+        
+        dom.confirmBatchUploadBtn.disabled = true; dom.confirmBatchUploadBtn.textContent = "⏳ 智慧寫入雲端中...";
         try {
             for(let item of parsedData) {
-                const docId = `Hanlin_Chinese_${item.s}_${item.g}_${item.l}`; 
+                // 完全動態組合 Document ID
+                const docId = `${item.p}_${item.su}_${item.s}_${item.g}_${item.l}`; 
                 const ref = db.collection(CURRICULUM_COLLECTION).doc(docId); const snap = await ref.get();
-                let cont = snap.exists ? snap.data().content : { mainText: "", fields: [] }; if(!cont.fields) cont.fields = [];
-                const update = (lbl, data) => { const i = cont.fields.findIndex(f=>f.label===lbl); if(i>-1) cont.fields[i].data = data; else cont.fields.push({label:lbl, data}); };
-                if(mode==='ai_shengzi') update("習寫字", item.c.split('')); else if(mode==='ai_lesson_text') cont.mainText = item.c;
-                else if(mode==='ai_terms') update("語詞", item.c); else if(mode==='ai_patterns') update("句型練習", item.c);
-                await ref.set({ id: docId, publisher: "Hanlin", subject: "Chinese", semester: item.s, grade: item.g, unit: item.l, content: cont, lastUpdated: firebase.firestore.FieldValue.serverTimestamp() });
+                
+                let cont = snap.exists ? snap.data().content : { fields: [] }; 
+                if (!cont.fields) cont.fields = [];
+                if (cont.mainText && !cont.fields.find(f => f.label === '課文')) cont.fields.push({ label: '課文', data: [cont.mainText] });
+                delete cont.mainText; 
+                
+                const fieldIndex = cont.fields.findIndex(f => f.label === targetTitle);
+                if (fieldIndex > -1) cont.fields[fieldIndex].data = item.c; 
+                else cont.fields.push({ label: targetTitle, data: item.c }); 
+
+                await ref.set({ id: docId, publisher: item.p, subject: item.su, semester: item.s, grade: item.g, unit: item.l, content: cont, lastUpdated: firebase.firestore.FieldValue.serverTimestamp() });
                 existingPaths.add(docId);
             }
-            showToast("✅ 批次寫入成功！"); dom.aiPreviewArea.classList.add('hidden'); dom.aiResultPreviewDynamic.innerHTML = '';
+            showToast(`✅ 批次寫入成功！內容已填入「${targetTitle}」欄位。`); dom.aiPreviewArea.classList.add('hidden'); dom.aiResultPreviewDynamic.innerHTML = '';
             currentDocCache = {}; renderNavigator(currentPathParts.length);
         } catch(e) { showToast("❌ 寫入失敗", "error"); }
         finally { dom.confirmBatchUploadBtn.disabled = false; dom.confirmBatchUploadBtn.textContent = "🚀 確認無誤，寫入資料庫"; }
@@ -987,13 +1163,9 @@
         document.getElementById("closeAdminBtn").addEventListener("click", () => { playSound('click'); dom.adminModal.classList.remove("visible"); dom.adminModal.classList.add("hidden"); });
         
         dom.addCustomSubBtn.addEventListener("click", addCustomSubject); dom.saveWorkspaceBtn.addEventListener("click", toggleWorkspaceShortcut);
-        document.getElementById("loadDataBtn").addEventListener("click", handleLoadData); document.getElementById("saveDataBtn").addEventListener("click", handleSaveData);
+        document.getElementById("loadDataBtn").addEventListener("click", handleLoadData); dom.saveDataBtn.addEventListener("click", handleSaveData);
         document.getElementById("fetchUnitsBtn").addEventListener("click", fetchUnitsForAdmin); document.getElementById("createNewUnitBtn").addEventListener("click", showAdminUnitInput);
-        document.getElementById("deleteDocBtn").addEventListener("click", handleDeleteDocument);
         
-        document.getElementById("adminForm").addEventListener('click', (e) => {
-            if(e.target.dataset.clearId) { playSound('click'); const id = e.target.dataset.clearId; document.getElementById(`adminLabel${id}`).value = ""; document.getElementById(`adminContent${id}`).value = ""; }
-        });
         const f = getAdminFormObj(); [f.publisher, f.subject, f.semester, f.grade, f.unitId, f.unitSelector].forEach(el => { if(el) el.addEventListener(el.tagName==='INPUT'?'input':'change', updateAdminDocIdPreview); });
 
         dom.fileUploadInput.addEventListener("change", (e) => {
